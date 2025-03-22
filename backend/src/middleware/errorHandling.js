@@ -1,12 +1,12 @@
 const errorHandling = (err, req, res, next) => {
-  const errStatus = 500;
-  const errMessage = 'Internal server error!';
+  const errStatus = err.statusCode || 500;
+  const errMessage = err.message || 'Internal server error!';
 
   return res.status(errStatus).json({
     success: false,
     status: errStatus,
     message: errMessage,
-    stack: err.stack,
+    stack: err.stack, // do not show in fe
   });
 };
 
