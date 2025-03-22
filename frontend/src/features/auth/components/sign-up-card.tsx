@@ -13,8 +13,9 @@ import { Separator } from "@/components/ui/separator";
 import { TriangleAlert } from "lucide-react";
 
 import { useState } from "react";
-import { signUp } from "@/services/api";
-import { setTeacher } from "@/lib/storage";
+// Đổi import
+import { signUp } from "@/services/auth";
+import { setUser } from "@/lib/storage";
 import { useRouter } from "next/navigation";
 import { SignInflow } from "../api/auth-types";
 
@@ -36,20 +37,36 @@ export const SignUpCard = ({ setstate }: SignUpCardProps) => {
     e.preventDefault();
     setError("");
 
+    if (!username || !email || !password || !confirmPassword) {
+      setError("Please fill all the fields.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Email is not valid.");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      return;
+    }
+
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError("Passwords do not match.");
       return;
     }
 
     setPending(true);
     try {
-      const newTeacher = await signUp(username, email, password);
-      console.log("Signed up successfully:", newTeacher);
+      const newUser = await signUp(username, email, password);
+      console.log("Registered user:", newUser);
 
-      setTeacher(newTeacher);
-      router.push("/dashboard");
+      setstate("SignIn");
     } catch (err: any) {
-      setError("Sign up failed");
+      const backendError = err.response?.data?.message;
+      setError(backendError || "Something went wrong!");
     } finally {
       setPending(false);
     }
@@ -58,7 +75,7 @@ export const SignUpCard = ({ setstate }: SignUpCardProps) => {
   return (
     <Card className="w-full h-full p-8">
       <CardHeader className="px-0 pt-0">
-        <CardTitle>Create your teacher account</CardTitle>
+        <CardTitle>Create your new account</CardTitle>
         <CardDescription>
           Sign up to manage your flash game modules
         </CardDescription>

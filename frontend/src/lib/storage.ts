@@ -1,19 +1,19 @@
-const TEACHER_KEY = "teacher";
+const USER_KEY = "user";
 
 const isBrowser = typeof window !=="undefined";
 
-export function setTeacher (teacher: any) {
+export function setUser (user: any) {
     if (!isBrowser) return;
-    localStorage.setItem(TEACHER_KEY, JSON.stringify(teacher))
+    localStorage.setItem(USER_KEY, JSON.stringify(user))
 }
 
-export function getTeacher (): any | null {
+export function getUser (): any | null {
     if(!isBrowser) return null;
-    const value = localStorage.getItem(TEACHER_KEY);
+    const value = localStorage.getItem(USER_KEY);
     return value ? JSON.parse(value) : null;
 }
 
-export function removeTeacher() {
+export function removeUser() {
     if (!isBrowser) return;
-    localStorage.removeItem(TEACHER_KEY);
+    localStorage.removeItem(USER_KEY);
 }

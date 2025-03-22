@@ -2,7 +2,7 @@
 // src/services/api.ts (MOCK API)
 
 // Types
-type Teacher = {
+type User = {
   id: string;
   username: string;
   email: string;
@@ -13,7 +13,7 @@ type Subject = {
   id: string;
   name: string;
   ageGroup: string;
-  teacherId: string;
+  userId: string;
 };
 
 type Option = {
@@ -30,24 +30,24 @@ type Question = {
 };
 
 // In-memory data store
-const teachers: Teacher[] = [];
+const users: User[] = [];
 const subjects: Subject[] = [];
 const questions: Question[] = [];
 
 // TEACHER AUTH
 export async function signUp(username: string, email: string, password: string) {
-  const existed = teachers.find(t => t.email === email);
+  const existed = users.find(t => t.email === email);
   if (existed) throw new Error("Email already in use");
 
   const id = crypto.randomUUID();
   const teacher = { id, username, email, password };
-  teachers.push(teacher);
+  users.push(teacher);
   return teacher;
 }
 
 
 export async function logIn(email: string, password: string) {
-  return teachers.find(t => t.email === email && t.password === password) || null;
+  return users.find(t => t.email === email && t.password === password) || null;
 }
 
 export async function logOut() {
@@ -70,11 +70,11 @@ function loadSubjectsFromLocalStorage() {
   }
 }
 
-export async function createSubject(name: string, ageGroup: string, teacherId: string) {
+export async function createSubject(name: string, ageGroup: string, userId: string) {
   loadSubjectsFromLocalStorage();
 
   const id = crypto.randomUUID();
-  const subject = { id, name, ageGroup, teacherId };
+  const subject = { id, name, ageGroup, userId };
   subjects.push(subject);
 
   saveSubjectsToLocalStorage();
@@ -86,12 +86,12 @@ export async function getSubjectsByAge(ageGroup: string) {
   return subjects.filter(s => s.ageGroup === ageGroup);
 }
 
-export async function getSubjectsByTeacher(teacherId: string) {
-  return subjects.filter(s => s.teacherId === teacherId);
+export async function getSubjectsByUser(userId: string) {
+  return subjects.filter(s => s.userId === userId);
 }
 
-export async function updateSubjectName(subjectId: string, newName: string, teacherId: string) {
-  const subject = subjects.find(s => s.id === subjectId && s.teacherId === teacherId);
+export async function updateSubjectName(subjectId: string, newName: string, userId: string) {
+  const subject = subjects.find(s => s.id === subjectId && s.userId === userId);
   if (!subject) throw new Error("Subject không tồn tại hoặc không thuộc giáo viên này");
 
   subject.name = newName;
@@ -100,10 +100,10 @@ export async function updateSubjectName(subjectId: string, newName: string, teac
   return subject;
 }
 
-export async function deleteSubject(subjectId: string, teacherId: string) {
+export async function deleteSubject(subjectId: string, userId: string) {
   loadSubjectsFromLocalStorage();
 
-  const index = subjects.findIndex(s => s.id === subjectId && s.teacherId === teacherId);
+  const index = subjects.findIndex(s => s.id === subjectId && s.userId === userId);
   if (index !== -1) {
     subjects.splice(index, 1);
     saveSubjectsToLocalStorage();

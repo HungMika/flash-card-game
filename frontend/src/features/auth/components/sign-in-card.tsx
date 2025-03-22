@@ -10,22 +10,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { TriangleAlert } from "lucide-react";
+
 import { FcGoogle } from "react-icons/fc";
+import { TriangleAlert } from "lucide-react";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SignInflow } from "../api/auth-types";
 
-import { logIn } from "@/services/api";
-import { setTeacher } from "@/lib/storage";
+import { setUser } from "@/lib/storage";
+import { logIn } from "@/services/auth";
 
 interface SignInCardProps {
   setstate: (state: SignInflow) => void;
 }
 
 export const SignInCard = ({ setstate }: SignInCardProps) => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -37,19 +38,22 @@ export const SignInCard = ({ setstate }: SignInCardProps) => {
     setPending(true);
     setError("");
 
+    if (!username || !password) {
+      setError("Please fill all the fields.");
+      return;
+    }
+
     //TODO: call signIn api here
     try {
-      const teacher = await logIn(email, password);
+      const user = await logIn(username, password);
 
-      if (!teacher) {
-        setError("Invalid email or password");
-        return;
-      }
-
-      setTeacher(teacher);
+      setUser(user);
       router.push("/dashboard");
-    } catch (err) {
-      setError("Something went wrong!");
+    } catch (err: any) {
+      const backendMessage =
+        err?.response?.data?.message || "Login failed. Please try again.";
+
+      setError(backendMessage);
     } finally {
       setPending(false);
     }
@@ -63,7 +67,7 @@ export const SignInCard = ({ setstate }: SignInCardProps) => {
     <Card className="w=full max-w-md p-8 mx-auto mt-10">
       <CardHeader className="pt-0 px-0">
         <CardTitle>Log in to Flash dashboard</CardTitle>
-        <CardDescription>Use your email to continue</CardDescription>
+        {/* <CardDescription>Use your email to continue</CardDescription> */}
       </CardHeader>
 
       {error && (
@@ -76,12 +80,12 @@ export const SignInCard = ({ setstate }: SignInCardProps) => {
       <CardContent className="space-y-5 px-0 pb-0">
         <form className="space-y-2.5" onSubmit={onSubmit}>
           <Input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
             disabled={pending}
-            type="email"
-            placeholder="Email"
+            type="text"
+            placeholder="User name"
           />
           <Input
             value={password}

@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteSubject, updateSubjectName } from "@/services/api";
-import { getTeacher } from "@/lib/storage";
+import { getUser } from "@/lib/storage";
 import Link from "next/link";
 import {
   Dialog,
@@ -39,19 +39,19 @@ export const SubjectCard = ({
     "this action cannot be undone"
   );
 
-  const teacher = getTeacher();
+  const user = getUser();
 
   const handleDelete = async () => {
     const confirmed = await confirm();
-    if (!teacher) return;
+    if (!user) return;
     if (!confirmed) return;
-    await deleteSubject(id, teacher.id);
+    await deleteSubject(id, user.id);
     onChange();
   };
 
   const handleEdit = async () => {
-    if (!teacher || !newName.trim()) return;
-    await updateSubjectName(id, newName.trim(), teacher.id);
+    if (!user || !newName.trim()) return;
+    await updateSubjectName(id, newName.trim(), user.id);
     setEditOpen(false);
     onChange();
   };

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 import Link from "next/link";
-import { getTeacher } from "@/lib/storage";
+import { getUser } from "@/lib/storage";
 import { getSubjectsByAge } from "@/services/api";
 import { logoutTeacher } from "@/lib/auth-log-out";
 import { AgeGroupSelector } from "@/components/AgeGroupSelector";
@@ -17,10 +17,10 @@ type Subject = {
   id: string;
   name: string;
   ageGroup: string;
-  teacherId: string;
+  userId: string;
 };
 
-type Teacher = {
+type User = {
   id: string;
   username: string;
   email: string;
@@ -29,14 +29,14 @@ type Teacher = {
 export default function DashboardPage() {
   const [selectedAge, setSelectedAge] = useState<string | null>(null);
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [teacher, setTeacher] = useState<Teacher | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const currTeacher = getTeacher();
-    if (!currTeacher) {
+    const currUser = getUser();
+    if (!currUser) {
       logoutTeacher();
     } else {
-      setTeacher(currTeacher);
+      setUser(currUser);
     }
   }, []);
 
@@ -46,7 +46,7 @@ export default function DashboardPage() {
     }
   }, [selectedAge]);
 
-  if (!teacher) return null;
+  if (!user) return null;
 
   return (
     <div className="flex flex-col min-h-screen">
