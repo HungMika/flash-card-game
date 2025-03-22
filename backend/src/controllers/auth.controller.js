@@ -1,68 +1,18 @@
 const bcrypt = require('bcrypt');
-const validator = require('validator');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
+const { validateRegister, validateLogin } = require('../utils/auth');
+const { APIError } = require('../error');
 
 require('dotenv').config();
 
 const authController = {
-  generateAccessToken: (user) => {
-    return jwt.sign(
-      {
-        id: user._id,
-      },
-      process.env.JWT_ACCESS_KEY,
-      {
-        expiresIn: '1h',
-      },
-    );
-  },
-
-  generateRefreshToken: (user) => {
-    return jwt.sign(
-      {
-        id: user._id,
-      },
-      process.env.JWT_REFRESH_KEY,
-      {
-        expiresIn: '30d',
-      },
-    );
-  },
-
   // [POST] /auth/register
   register: async (req, res, next) => {
     try {
       const { username, email, password } = req.body;
-
-      // validate register input
-      if (!username || !email || !password) {
-        return res.status(400).json({ message: 'Please fill all the fields!' });
-      }
-      if (!validator.isEmail(email)) {
-        return res.status(400).json({ message: 'Email is not valid!' });
-      }
-      if (password.length < 8) {
-        return res
-          .status(400)
-          .json({ message: 'Password must have at least 8 characters' });
-      }
-
-      // if user already exists
-      const existingUser = await User.findOne({
-        $or: [{ username: username }, { email: email }],
-      });
-      if (existingUser) {
-        if (username === existingUser.username) {
-          return res.status(400).json({ message: 'Username already exists!' });
-        }
-        if (email === existingUser.email) {
-          return res.status(400).json({ message: 'Email already exists!' });
-        }
-      }
-
-      // hash password
+      await validateRegister(username, email, password);
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // save user
@@ -83,30 +33,21 @@ const authController = {
   login: async (req, res, next) => {
     try {
       const { username, password } = req.body;
-
-      // check user fill username or password
-      if (!username || !password) {
-        return res.status(400).json({ message: 'Please fill all the fields!' });
-      }
-
-      // find user by username
-      const user = await User.findOne({ username });
-      if (!user) {
-        return res.status(404).json({ message: 'Invalid username!' });
-      }
-
-      // check password
-      const isMatchPassword = bcrypt.compare(password, user.password);
-      if (!isMatchPassword) {
-        return res.status(401).json({ message: 'Invalid password!' });
-      }
-
-      if (user && isMatchPassword) {
+      const user = await validateLogin(username, password);
+      if (user) {
         // generate token
-        const accessToken = authController.generateAccessToken(user);
-        const refreshToken = authController.generateRefreshToken(user);
+        const accessToken = jwt.sign(
+          { id: user._id },
+          process.env.JWT_ACCESS_KEY,
+          { expiresIn: '30s' },
+        );
+        const refreshToken = jwt.sign(
+          { id: user._id },
+          process.env.JWT_REFRESH_KEY,
+          { expiresIn: '300s' },
+        );
 
-        // save token to cookies
+        // store token in cookies
         res.cookie('accessToken', accessToken, {
           // httpOnly: true,
           // secure: true,
@@ -130,25 +71,33 @@ const authController = {
     }
   },
 
+  // [POST] /auth/refresh
   refreshToken: async (req, res, next) => {
     try {
       // take refresh token form user
       const refreshToken = req.cookies?.refreshToken;
       if (!refreshToken) {
-        return res.status(403).json({ message: 'Unauthorized' });
+        throw new APIError('You must be login!', 401);
       }
 
       jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY, (err, payload) => {
         if (err) {
-          return res
-            .status(403)
-            .json({ message: 'Refresh token is not valid!' });
+          throw new APIError('Invalid refresh token!', 403);
         }
 
-        const newAccessToken = authController.generateAccessToken(payload);
-        const newRefreshToken = authController.generateRefreshToken(payload);
+        // generate new token
+        const newAccessToken = jwt.sign(
+          { id: payload.id },
+          process.env.JWT_ACCESS_KEY,
+          { expiresIn: '30s' },
+        );
+        const newRefreshToken = jwt.sign(
+          { id: payload.id },
+          process.env.JWT_REFRESH_KEY,
+          { expiresIn: '300s' },
+        );
 
-        // save token to cookies
+        // store token in cookies
         res.cookie('accessToken', newAccessToken, {
           // httpOnly: true,
           // secure: true,
