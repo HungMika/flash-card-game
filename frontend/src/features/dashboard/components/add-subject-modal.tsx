@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import { createSubject } from "@/services/api";
-import { getTeacher } from "@/lib/storage";
+import { getUser } from "@/lib/storage";
 
 interface AddSubjectModalProps {
   ageGroup: string;
@@ -28,7 +28,7 @@ export const AddSubjectModal = ({
   const [subjectName, setSubjectName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const teacherId = getTeacher()?.id || "";
+  const teacherId = getUser()?.id || "";
 
   const handleAdd = async () => {
     if (!subjectName.trim()) return;

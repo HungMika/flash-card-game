@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { getUser } from "@/lib/storage";
 import { getSubjectsByAge } from "@/services/api";
-import { logoutTeacher } from "@/lib/auth-log-out";
+import { logoutUser } from "@/lib/auth-log-out";
 import { AgeGroupSelector } from "@/components/AgeGroupSelector";
 import { DashboardHeader } from "@/features/dashboard/components/header";
 import { SubjectCard } from "@/components/SubjectCard";
@@ -34,7 +34,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const currUser = getUser();
     if (!currUser) {
-      logoutTeacher();
+      logoutUser();
     } else {
       setUser(currUser);
     }
