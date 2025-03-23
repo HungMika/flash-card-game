@@ -1,10 +1,11 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { getUser } from "@/lib/storage";
-import { logoutUser } from "@/lib/auth-log-out";
-import { logOut } from "@/services/auth";
-import { useEffect, useState } from "react";
+import { Button } from '@/components/ui/button';
+import { getUser, removeUser } from '@/lib/storage';
+import { logoutUser } from '@/lib/auth-log-out';
+import { logOut } from '@/services/auth';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface User {
   id: string;
@@ -14,16 +15,27 @@ interface User {
 
 export const DashboardHeader = () => {
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const currUser = getUser();
     if (!currUser) {
-      console.error("User not found");
+      console.error('User not found');
       //logOut();
     } else {
       setUser(currUser);
     }
   }, []);
+
+  const handleLogOut = async () => {
+    try {
+      await logOut();
+      removeUser();
+      router.replace('/auth');
+    } catch (error) {
+      console.error('Error while logging out:', error);
+    }
+  };
 
   if (!user) return null;
 
@@ -33,7 +45,7 @@ export const DashboardHeader = () => {
         <h1 className="text-lg font-semibold">Chào mừng, {user.username}!</h1>
         <p className="text-sm text-muted-foreground">{user.email}</p>
       </div>
-      <Button variant="outline" onClick={() => logOut()}>
+      <Button variant="outline" onClick={handleLogOut}>
         Đăng xuất
       </Button>
     </header>

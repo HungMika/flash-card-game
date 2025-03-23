@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
-import Link from "next/link";
-import { getUser } from "@/lib/storage";
-import { getSubjectsByAge } from "@/services/api";
-import { logoutUser } from "@/lib/auth-log-out";
-import { AgeGroupSelector } from "@/components/AgeGroupSelector";
-import { DashboardHeader } from "@/features/dashboard/components/header";
-import { SubjectCard } from "@/components/SubjectCard";
-import { AddSubjectModal } from "@/features/dashboard/components/add-subject-modal";
+import Link from 'next/link';
+import { getUser } from '@/lib/storage';
+import { getSubjectsByAge } from '@/services/api';
+import { logoutUser } from '@/lib/auth-log-out';
+import { AgeGroupSelector } from '@/components/AgeGroupSelector';
+import { DashboardHeader } from '@/features/dashboard/components/header';
+import { SubjectCard } from '@/components/SubjectCard';
+import { AddSubjectModal } from '@/features/dashboard/components/add-subject-modal';
 
 type Subject = {
   id: string;
