@@ -11,7 +11,7 @@ export default function DashboardLayout({
   const router = useRouter();
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("teacher");
+    const isLoggedIn = localStorage.getItem("user");
     if (!isLoggedIn) {
       router.push("/auth");
     }

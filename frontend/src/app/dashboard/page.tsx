@@ -33,11 +33,9 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const currUser = getUser();
-    if (!currUser) {
-      logoutUser();
-    } else {
-      setUser(currUser);
-    }
+    if (!currUser || !currUser._id) return;
+
+    setUser(currUser);
   }, []);
 
   useEffect(() => {

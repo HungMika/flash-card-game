@@ -24,10 +24,17 @@ export async function logIn (username: string, password: string) {
     return res.data;
 }
 
-export async function logOut () {
-    const res = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/logout`, {
-        withCredentials: true
+export async function logOut() {
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/logout`,
+      {}, // body rỗng
+      {
+        withCredentials: true,
+        // headers: {
+        //     Authorization: `Bearer ${accessToken}`
+        // }
       }
     );
     return res.data;
-}
+  }
+  

@@ -6,19 +6,20 @@ import { logoutUser } from "@/lib/auth-log-out";
 import { logOut } from "@/services/auth";
 import { useEffect, useState } from "react";
 
-interface Teacher {
+interface User {
   id: string;
   username: string;
   email: string;
 }
 
 export const DashboardHeader = () => {
-  const [user, setUser] = useState<Teacher | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const currUser = getUser();
     if (!currUser) {
-      logOut();
+      console.error("User not found");
+      //logOut();
     } else {
       setUser(currUser);
     }
