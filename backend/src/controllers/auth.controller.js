@@ -61,7 +61,12 @@ const authController = {
         //   // sameSite: 'Strict',
         // });
 
-        const { password, ...others } = user._doc;
+        const { _id, password, ...others } = user._doc;
+        res.cookie('userId', _id, {
+          // httpOnly: true,
+          // secure: true,
+          // sameSite: 'Strict',
+        });
 
         return res.status(200).json({ ...others });
       }
@@ -133,6 +138,11 @@ const authController = {
       //   // secure: true,
       //   // sameSite: 'Strict',
       // });
+      res.clearCookie('userId', {
+        // httpOnly: true,
+        // secure: true,
+        // sameSite: 'Strict',
+      });
       return res.status(200).json({ message: 'Log out successfully!' });
     } catch (error) {
       next(error);
