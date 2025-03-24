@@ -56,28 +56,30 @@ export default function DashboardPage() {
         <AgeGroupSelector selectedAge={selectedAge} onSelect={setSelectedAge} />
 
         {selectedAge && (
-          <div className="relative border rounded-lg p-4 max-h-[480px] overflow-y-auto">
-            {subjects.length === 0 ? (
-              <p className="text-center text-muted-foreground mb-20">
-                Chưa có subject nào cho độ tuổi này
-              </p>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-20">
-                {subjects.map((subject) => (
-                  <SubjectCard
-                    key={subject.id}
-                    id={subject.id}
-                    name={subject.name}
-                    ageGroup={subject.ageGroup}
-                    onChange={() =>
-                      getSubjectsByAge(selectedAge).then(setSubjects)
-                    }
-                  />
-                ))}
-              </div>
-            )}
+          <div className="relative border rounded-lg p-4 flex flex-col max-h-[480px]">
+            <div className="overflow-y-auto flex-1 mb-4">
+              {subjects.length === 0 ? (
+                <p className="text-center text-muted-foreground">
+                  Chưa có subject nào cho độ tuổi này
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {subjects.map((subject) => (
+                    <SubjectCard
+                      key={subject.id}
+                      id={subject.id}
+                      name={subject.name}
+                      ageGroup={subject.ageGroup}
+                      onChange={() =>
+                        getSubjectsByAge(selectedAge).then(setSubjects)
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
 
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+            <div className="mt-auto flex justify-center">
               <AddSubjectModal
                 ageGroup={selectedAge}
                 onSubjectAdded={() =>
