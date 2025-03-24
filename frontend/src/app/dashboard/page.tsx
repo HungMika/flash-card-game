@@ -1,17 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { useState, useEffect, useRef } from 'react';
 
-import Link from 'next/link';
-import { getUser } from '@/lib/storage';
 import { getSubjectsByAge } from '@/services/api';
-import { logoutUser } from '@/lib/auth-log-out';
 import { AgeGroupSelector } from '@/components/AgeGroupSelector';
 import { DashboardHeader } from '@/features/dashboard/components/header';
 import { SubjectCard } from '@/components/SubjectCard';
 import { AddSubjectModal } from '@/features/dashboard/components/add-subject-modal';
+import { getCurrUser } from '@/services/user';
 
 type Subject = {
   id: string;
@@ -30,12 +26,24 @@ export default function DashboardPage() {
   const [selectedAge, setSelectedAge] = useState<string | null>(null);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [user, setUser] = useState<User | null>(null);
+  const hasFetchedRef = useRef(false);
 
+  // GET CURRENT USER FROM API
   useEffect(() => {
-    const currUser = getUser();
-    if (!currUser || !currUser._id) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+    //fix lỗi log user 2 lần
 
-    setUser(currUser);
+    async function fetchUser() {
+      const userData = await getCurrUser();
+      console.log('User data:', userData);
+      if (userData) {
+        setUser(userData);
+      } else {
+        alert('User data not found.');
+      }
+    }
+    fetchUser();
   }, []);
 
   useEffect(() => {
