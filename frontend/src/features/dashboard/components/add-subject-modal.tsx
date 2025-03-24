@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Dialog,
   DialogTrigger,
@@ -8,12 +8,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
-import { createSubject } from "@/services/api";
-import { getTeacher } from "@/lib/storage";
+import { createSubject } from '@/services/api';
+import { getUser } from '@/lib/storage';
 
 interface AddSubjectModalProps {
   ageGroup: string;
@@ -25,21 +25,21 @@ export const AddSubjectModal = ({
   onSubjectAdded,
 }: AddSubjectModalProps) => {
   const [open, setOpen] = useState(false);
-  const [subjectName, setSubjectName] = useState("");
+  const [subjectName, setSubjectName] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const teacherId = getTeacher()?.id || "";
+  const teacherId = getUser()?.id || '';
 
   const handleAdd = async () => {
     if (!subjectName.trim()) return;
     setLoading(true);
     try {
       await createSubject(subjectName, ageGroup, teacherId);
-      setSubjectName("");
+      setSubjectName('');
       setOpen(false);
       onSubjectAdded();
     } catch (error) {
-      console.error("Lỗi khi thêm subject:", error);
+      console.error('Lỗi khi thêm subject:', error);
     } finally {
       setLoading(false);
     }
@@ -66,7 +66,7 @@ export const AddSubjectModal = ({
 
         <DialogFooter className="mt-6">
           <Button disabled={loading} onClick={handleAdd}>
-            {loading ? "Loading..." : "Add"}
+            {loading ? 'Loading...' : 'Add'}
           </Button>
         </DialogFooter>
       </DialogContent>
