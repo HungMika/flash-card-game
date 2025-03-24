@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
 const { validateRegister, validateLogin } = require('../utils/auth');
-const { APIError } = require('../error');
 
 require('dotenv').config();
 
@@ -13,6 +12,8 @@ const authController = {
     try {
       const { username, email, password } = req.body;
       await validateRegister(username, email, password);
+
+      // hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // save user
@@ -39,28 +40,26 @@ const authController = {
         const accessToken = jwt.sign(
           { id: user._id },
           process.env.JWT_ACCESS_KEY,
-          { expiresIn: '30s' },
+          { expiresIn: '1h' },
         );
-        const refreshToken = jwt.sign(
-          { id: user._id },
-          process.env.JWT_REFRESH_KEY,
-          { expiresIn: '300s' },
-        );
+        // const refreshToken = jwt.sign(
+        //   { id: user._id },
+        //   process.env.JWT_REFRESH_KEY,
+        //   { expiresIn: '7d' },
+        // );
 
         // store token in cookies
         res.cookie('accessToken', accessToken, {
           // httpOnly: true,
           // secure: true,
-          // path: '/',
           // sameSite: 'Strict',
         });
 
-        res.cookie('refreshToken', refreshToken, {
-          // httpOnly: true,
-          // secure: true,
-          // path: '/',
-          // sameSite: 'Strict',
-        });
+        // res.cookie('refreshToken', refreshToken, {
+        //   // httpOnly: true,
+        //   // secure: true,
+        //   // sameSite: 'Strict',
+        // });
 
         const { password, ...others } = user._doc;
 
@@ -77,38 +76,36 @@ const authController = {
       // take refresh token form user
       const refreshToken = req.cookies?.refreshToken;
       if (!refreshToken) {
-        throw new APIError('You must be login!', 401);
+        return res.status(401).json({ message: 'You must be login!' });
       }
 
       jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY, (err, payload) => {
         if (err) {
-          throw new APIError('Invalid refresh token!', 403);
+          return res.status(403).json({ message: 'Invalid token!' });
         }
 
         // generate new token
         const newAccessToken = jwt.sign(
           { id: payload.id },
           process.env.JWT_ACCESS_KEY,
-          { expiresIn: '30s' },
+          { expiresIn: '1h' },
         );
         const newRefreshToken = jwt.sign(
           { id: payload.id },
           process.env.JWT_REFRESH_KEY,
-          { expiresIn: '300s' },
+          { expiresIn: '7d' },
         );
 
         // store token in cookies
         res.cookie('accessToken', newAccessToken, {
           // httpOnly: true,
           // secure: true,
-          // path: '/',
           // sameSite: 'Strict',
         });
 
         res.cookie('refreshToken', newRefreshToken, {
           // httpOnly: true,
           // secure: true,
-          // path: '/',
           // sameSite: 'Strict',
         });
 
@@ -129,15 +126,13 @@ const authController = {
       res.clearCookie('accessToken', {
         // httpOnly: true,
         // secure: true,
-        // path: '/',
         // sameSite: 'Strict',
       });
-      res.clearCookie('refreshToken', {
-        // httpOnly: true,
-        // secure: true,
-        // path: '/',
-        // sameSite: 'Strict',
-      });
+      // res.clearCookie('refreshToken', {
+      //   // httpOnly: true,
+      //   // secure: true,
+      //   // sameSite: 'Strict',
+      // });
       return res.status(200).json({ message: 'Log out successfully!' });
     } catch (error) {
       next(error);
