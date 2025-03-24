@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const requireLogin = (req, res, next) => {
+const requireAuth = (req, res, next) => {
   try {
     const accessToken = req.cookies?.accessToken;
     if (!accessToken) {
@@ -20,4 +20,4 @@ const requireLogin = (req, res, next) => {
   }
 };
 
-module.exports = requireLogin;
+module.exports = requireAuth;
