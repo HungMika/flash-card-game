@@ -32,6 +32,22 @@ const questionController = {
       next(error);
     }
   },
+
+  // [GET] /question/show/all/:subjectId
+  showAll: async (req, res, next) => {
+    try {
+      const { subjectId } = req.params;
+
+      const questions = await Question.find({ subjectId }).lean();
+      if (!questions.length) {
+        return res.status(404).json({ message: 'No questions found!' });
+      }
+
+      return res.status(200).json(questions);
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 module.exports = questionController;
