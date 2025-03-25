@@ -2,16 +2,27 @@ const mongoose = require('mongoose');
 
 const questionSchema = new mongoose.Schema(
   {
+    subjectId: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
       trim: true,
     },
-    answer: {
+    correctAnswer: {
       type: String,
       required: true,
       trim: true,
     },
+    wrongAnswer: [
+      {
+        type: String,
+        required: true,
+        trim: true,
+      },
+    ],
   },
   {
     timestamps: true,
