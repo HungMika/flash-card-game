@@ -67,7 +67,6 @@ export const SubjectCard = ({
           {name}
         </Link>
 
-        {/* Icon sửa + xoá bên phải */}
         <div className="flex items-center gap-2">
           <Dialog open={editOpen} onOpenChange={setEditOpen}>
             <DialogTrigger asChild>

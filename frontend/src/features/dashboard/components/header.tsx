@@ -1,10 +1,8 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { getUser, removeUser } from '@/lib/storage';
-import { logoutUser } from '@/lib/auth-log-out';
+import { removeUser } from '@/lib/storage';
 import { logOut } from '@/services/auth';
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface User {
@@ -13,19 +11,12 @@ interface User {
   email: string;
 }
 
-export const DashboardHeader = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const router = useRouter();
+interface DashboardHeaderProps {
+  user: User;
+}
 
-  useEffect(() => {
-    const currUser = getUser();
-    if (!currUser) {
-      console.error('User not found');
-      //logOut();
-    } else {
-      setUser(currUser);
-    }
-  }, []);
+export const DashboardHeader = ({ user }: DashboardHeaderProps) => {
+  const router = useRouter();
 
   const handleLogOut = async () => {
     try {

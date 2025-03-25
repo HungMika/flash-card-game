@@ -5,6 +5,7 @@ import Link from 'next/link';
 const ageGroups = ['1-2', '3-5', '6-8', '9-12'];
 
 export default function DashboardPage() {
+
   return (
     <div className="p-6 space-y-4">
       <h1 className="text-2xl font-bold">Chọn lớp</h1>
