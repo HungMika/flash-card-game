@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Subject = require('../models/Subject');
 
 const subjectController = {
@@ -94,6 +95,30 @@ const subjectController = {
       if (!subjects.length) {
         return res.status(404).json({ message: 'Subject not found!' });
       }
+
+      return res.status(200).json(subjects);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // [PATCH] /subject/update
+  update: async (req, res, next) => {
+    try {
+      const { subjectId } = req.params;
+      const { name, group } = req.body;
+
+      if (!mongoose.Types.ObjectId.isValid(subjectId)) {
+        return res.status(400).json({ message: 'Invalid subjectId!' });
+      }
+
+      const subjects = await Subject.findByIdAndUpdate(
+        { _id: subjectId },
+        { name, group },
+        { new: true },
+      )
+        .lean()
+        .select('-questions');
 
       return res.status(200).json(subjects);
     } catch (error) {
