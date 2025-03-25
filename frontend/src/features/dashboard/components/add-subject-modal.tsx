@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Dialog,
   DialogTrigger,
@@ -12,30 +12,43 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
-import { createSubject } from '@/services/api';
-import { getUser } from '@/lib/storage';
+import { createSubject } from '@/services/subject';
 
 interface AddSubjectModalProps {
+  user: { _id: string };
   ageGroup: string;
   onSubjectAdded: () => void;
 }
 
 export const AddSubjectModal = ({
+  user,
   ageGroup,
   onSubjectAdded,
 }: AddSubjectModalProps) => {
   const [open, setOpen] = useState(false);
-  const [subjectName, setSubjectName] = useState('');
   const [loading, setLoading] = useState(false);
+  const subjectNameRef = useRef<HTMLInputElement | null>(null);
 
-  const teacherId = getUser()?.id || '';
+  console.log('User in AddSubjectModal:', user);
 
   const handleAdd = async () => {
-    if (!subjectName.trim()) return;
+    const subjectName = subjectNameRef.current?.value.trim();
+    if (!subjectName) return;
+
+    const userId = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('userId='))
+      ?.split('=')[1];
+
+    if (!userId) {
+      console.error('Không tìm thấy userId trong cookie.');
+      return;
+    }
+
     setLoading(true);
     try {
-      await createSubject(subjectName, ageGroup, teacherId);
-      setSubjectName('');
+      await createSubject(userId, subjectName, ageGroup);
+      subjectNameRef.current!.value = ''; // Clear input
       setOpen(false);
       onSubjectAdded();
     } catch (error) {
@@ -57,11 +70,7 @@ export const AddSubjectModal = ({
         </DialogHeader>
 
         <div className="space-y-4 mt-2">
-          <Input
-            placeholder="Tên subject (VD: Toán, Khoa học...)"
-            value={subjectName}
-            onChange={(e) => setSubjectName(e.target.value)}
-          />
+          <Input ref={subjectNameRef} placeholder="Tên subject (VD: Toán, Khoa học...)" />
         </div>
 
         <DialogFooter className="mt-6">
