@@ -60,7 +60,7 @@ const subjectController = {
     }
   },
 
-  // [GET] /subject/show/:group
+  // [GET] /subject/show
   show: async (req, res, next) => {
     try {
       const userId = req.cookies?.userId;
@@ -71,6 +71,28 @@ const subjectController = {
         .select('-questions');
       if (!subjects.length) {
         return res.status(404).json({ message: 'No subjects found!' });
+      }
+
+      return res.status(200).json(subjects);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // [GET] /subject/search
+  search: async (req, res, next) => {
+    try {
+      const { query } = req.body;
+
+      const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regexPattern = new RegExp(safeQuery, 'i');
+
+      const subjects = await Subject.find({ name: { $regex: regexPattern } })
+        .lean()
+        .select('-questions');
+
+      if (!subjects.length) {
+        return res.status(404).json({ message: 'Subject not found!' });
       }
 
       return res.status(200).json(subjects);

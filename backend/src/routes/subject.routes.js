@@ -8,5 +8,6 @@ router.post('/create', requireAuth, subjectController.create);
 router.get('/show/all', subjectController.showAll);
 router.get('/show/:group', subjectController.showByGroup);
 router.get('/show', requireAuth, subjectController.show);
+router.get('/search', subjectController.search);
 
 module.exports = router;
