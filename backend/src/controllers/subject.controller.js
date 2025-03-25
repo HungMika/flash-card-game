@@ -28,6 +28,20 @@ const subjectController = {
       next(error);
     }
   },
+
+  // [GET] /subject/show/all
+  showAll: async (req, res, next) => {
+    try {
+      const subjects = await Subject.find().lean().select('-questions');
+      if (!subjects) {
+        return res.status(404).json({ message: 'No subjects found!' });
+      }
+
+      return res.status(200).json(subjects);
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 module.exports = subjectController;
