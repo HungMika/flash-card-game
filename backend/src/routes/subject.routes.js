@@ -10,5 +10,6 @@ router.get('/show/:group', subjectController.showByGroup);
 router.get('/show', requireAuth, subjectController.show);
 router.get('/search', subjectController.search);
 router.patch('/update/:subjectId', requireAuth, subjectController.update);
+router.delete('/delete/:subjectId', requireAuth, subjectController.delete);
 
 module.exports = router;
