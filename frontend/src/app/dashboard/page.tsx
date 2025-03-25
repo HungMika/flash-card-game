@@ -56,10 +56,10 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <DashboardHeader />
+      <DashboardHeader user={user} />
 
       <div className="p-6 flex-1">
-        <h2 className="text-xl font-semibold mb-4">Chọn nhóm tuổi</h2>
+        <h2 className="text-xl font-semibold mb-4">Chọn nhóm lớp</h2>
 
         <AgeGroupSelector selectedAge={selectedAge} onSelect={setSelectedAge} />
 
@@ -68,7 +68,7 @@ export default function DashboardPage() {
             <div className="overflow-y-auto flex-1 mb-4">
               {subjects.length === 0 ? (
                 <p className="text-center text-muted-foreground">
-                  Chưa có subject nào cho độ tuổi này
+                  Chưa có subject nào cho nhóm lớp này
                 </p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
