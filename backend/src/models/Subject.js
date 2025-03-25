@@ -3,6 +3,10 @@ const { ObjectId } = mongoose.Schema.Types;
 
 const subjectSchema = new mongoose.Schema(
   {
+    userId: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       unique: true,
@@ -12,14 +16,13 @@ const subjectSchema = new mongoose.Schema(
     group: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
     },
     questions: [
       {
         type: ObjectId,
         ref: 'Question',
-        default: {},
+        default: [],
       },
     ],
   },
