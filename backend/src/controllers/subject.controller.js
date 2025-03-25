@@ -42,6 +42,23 @@ const subjectController = {
       next(error);
     }
   },
+
+  // [GET] /subject/show/:group
+  showByGroup: async (req, res, next) => {
+    try {
+      const { group } = req.params;
+      const subjects = await Subject.find({ group })
+        .lean()
+        .select('-questions');
+      if (!subjects.length) {
+        return res.status(404).json({ message: 'No subjects found!' });
+      }
+
+      return res.status(200).json(subjects);
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 module.exports = subjectController;
