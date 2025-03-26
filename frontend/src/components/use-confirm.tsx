@@ -40,7 +40,7 @@ export const useConfirm = (
 
   const ConfirmDialog = () => (
     <Dialog open={promise !== null} onOpenChange={handleCancel}>
-      <DialogContent className="bg-white">
+      <DialogContent className="bg-white w-[90vw] max-w-sm sm:max-w-md rounded-lg">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{message}</DialogDescription>
