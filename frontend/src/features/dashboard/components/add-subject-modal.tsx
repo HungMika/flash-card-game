@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 import { createSubject } from '@/services/subject';
+import { getCookie } from '@/lib/cookie';
 
 interface AddSubjectModalProps {
   user: { _id: string };
@@ -35,10 +36,8 @@ export const AddSubjectModal = ({
     const subjectName = subjectNameRef.current?.value.trim();
     if (!subjectName) return;
 
-    const userId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('userId='))
-      ?.split('=')[1];
+    const userId = getCookie('userId');
+    console.log('User ID:', userId);
 
     if (!userId) {
       console.error('Không tìm thấy userId trong cookie.');

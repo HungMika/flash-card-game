@@ -20,9 +20,10 @@ export const getSubjectByGroup = async (group: string) => {
     );
     return res.data;
   } catch (error: any) {
-    throw new Error(
-      error.res?.data?.message || 'Failed to fetch subjects by groups',
-    );
+    return [];
+    // throw new Error(
+    //   error.res?.data?.message || 'Failed to fetch subjects by groups',
+    // );
   }
 };
 

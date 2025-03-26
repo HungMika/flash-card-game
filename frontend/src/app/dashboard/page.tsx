@@ -8,6 +8,7 @@ import { DashboardHeader } from '@/features/dashboard/components/header';
 import { SubjectCard } from '@/components/SubjectCard';
 import { AddSubjectModal } from '@/features/dashboard/components/add-subject-modal';
 import { getCurrUser } from '@/services/user';
+import { redirect, useRouter } from 'next/navigation';
 
 type Subject = {
   _id: string;
@@ -28,6 +29,8 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const hasFetchedRef = useRef(false);
 
+  const router = useRouter();
+
   // GET CURRENT USER FROM API
   useEffect(() => {
     if (hasFetchedRef.current) return;
@@ -41,6 +44,7 @@ export default function DashboardPage() {
           setUser(userData);
         } else {
           alert('User data not found.');
+          router.replace('/auth');
         }
       } catch (error) {
         console.error('Lỗi khi lấy user:', error);
