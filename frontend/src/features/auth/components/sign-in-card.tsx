@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Card,
@@ -6,28 +6,29 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { TriangleAlert } from "lucide-react";
-import { FcGoogle } from "react-icons/fc";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { SignInflow } from "../api/auth-types";
+import { FcGoogle } from 'react-icons/fc';
+import { TriangleAlert } from 'lucide-react';
 
-import { logIn } from "@/services/api";
-import { setTeacher } from "@/lib/storage";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { SignInflow } from '../api/auth-types';
+
+import { setUser } from '@/lib/storage';
+import { logIn } from '@/services/auth';
 
 interface SignInCardProps {
   setstate: (state: SignInflow) => void;
 }
 
 export const SignInCard = ({ setstate }: SignInCardProps) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
 
   const router = useRouter();
@@ -35,35 +36,38 @@ export const SignInCard = ({ setstate }: SignInCardProps) => {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setPending(true);
-    setError("");
+    setError('');
+
+    if (!username || !password) {
+      setError('Please fill all the fields.');
+      return;
+    }
 
     //TODO: call signIn api here
     try {
-      const teacher = await logIn(email, password);
+      const user = await logIn(username, password);
 
-      if (!teacher) {
-        setError("Invalid email or password");
-        return;
-      }
+      setUser(user);
+      router.push('/dashboard');
+    } catch (err: any) {
+      const backendMessage =
+        err?.response?.data?.message || 'Login failed. Please try again.';
 
-      setTeacher(teacher);
-      router.push("/dashboard");
-    } catch (err) {
-      setError("Something went wrong!");
+      setError(backendMessage);
     } finally {
       setPending(false);
     }
   };
 
   const onGoogleSignIn = () => {
-    alert("test: Sign in with google");
+    alert('test: Sign in with google');
   };
 
   return (
     <Card className="w=full max-w-md p-8 mx-auto mt-10">
       <CardHeader className="pt-0 px-0">
         <CardTitle>Log in to Flash dashboard</CardTitle>
-        <CardDescription>Use your email to continue</CardDescription>
+        {/* <CardDescription>Use your email to continue</CardDescription> */}
       </CardHeader>
 
       {error && (
@@ -76,12 +80,12 @@ export const SignInCard = ({ setstate }: SignInCardProps) => {
       <CardContent className="space-y-5 px-0 pb-0">
         <form className="space-y-2.5" onSubmit={onSubmit}>
           <Input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
             disabled={pending}
-            type="email"
-            placeholder="Email"
+            type="text"
+            placeholder="User name"
           />
           <Input
             value={password}
@@ -95,9 +99,9 @@ export const SignInCard = ({ setstate }: SignInCardProps) => {
             type="submit"
             className="w-full"
             disabled={pending}
-            size={"lg"}
+            size={'lg'}
           >
-            {pending ? "Logging in ..." : "Continue"}
+            {pending ? 'Logging in ...' : 'Continue'}
           </Button>
         </form>
         <Separator />
@@ -107,7 +111,7 @@ export const SignInCard = ({ setstate }: SignInCardProps) => {
             disabled={pending}
             onClick={onGoogleSignIn}
             className="w-full relative"
-            variant={"outline"}
+            variant={'outline'}
             size="lg"
           >
             <FcGoogle className="size-5 absolute top-3 left-2.5" />
@@ -115,10 +119,10 @@ export const SignInCard = ({ setstate }: SignInCardProps) => {
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
-          Don&apos;t have an account?{" "}
+          Don&apos;t have an account?{' '}
           <span
             className="text-sky-700 hover:underline cursor-pointer"
-            onClick={() => setstate("SignUp")}
+            onClick={() => setstate('SignUp')}
           >
             Sign up
           </span>

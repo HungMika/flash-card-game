@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardLayout({
   children,
@@ -11,9 +11,9 @@ export default function DashboardLayout({
   const router = useRouter();
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("teacher");
+    const isLoggedIn = localStorage.getItem('user');
     if (!isLoggedIn) {
-      router.push("/auth");
+      router.push('/auth');
     }
   }, [router]);
 

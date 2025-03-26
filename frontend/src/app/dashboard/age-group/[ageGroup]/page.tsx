@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Link from "next/link";
+import Link from 'next/link';
 
-const ageGroups = ["1-2", "3-5", "6-8", "9-12"];
+const ageGroups = ['1-2', '3-5', '6-8', '9-12'];
 
 export default function DashboardPage() {
   return (

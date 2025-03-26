@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
 const { validateRegister, validateLogin } = require('../utils/auth');
-const { APIError } = require('../error');
 
 require('dotenv').config();
 
@@ -13,6 +12,8 @@ const authController = {
     try {
       const { username, email, password } = req.body;
       await validateRegister(username, email, password);
+
+      // hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // save user
@@ -39,85 +40,27 @@ const authController = {
         const accessToken = jwt.sign(
           { id: user._id },
           process.env.JWT_ACCESS_KEY,
-          { expiresIn: '30s' },
-        );
-        const refreshToken = jwt.sign(
-          { id: user._id },
-          process.env.JWT_REFRESH_KEY,
-          { expiresIn: '300s' },
+          { expiresIn: '30d' },
         );
 
         // store token in cookies
         res.cookie('accessToken', accessToken, {
-          // httpOnly: true,
-          // secure: true,
-          // path: '/',
-          // sameSite: 'Strict',
+          httpOnly: true,
+          secure: process.env.COOKIES_SECURE_DEV || true,
+          sameSite: 'None',
+          maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000 (ms)
         });
 
-        res.cookie('refreshToken', refreshToken, {
-          // httpOnly: true,
-          // secure: true,
-          // path: '/',
-          // sameSite: 'Strict',
+        const { _id, password, ...others } = user._doc;
+        res.cookie('userId', _id, {
+          httpOnly: true,
+          secure: process.env.COOKIES_SECURE_DEV || true,
+          sameSite: 'None',
+          maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000
         });
-
-        const { password, ...others } = user._doc;
 
         return res.status(200).json({ ...others });
       }
-    } catch (error) {
-      next(error);
-    }
-  },
-
-  // [POST] /auth/refresh
-  refreshToken: async (req, res, next) => {
-    try {
-      // take refresh token form user
-      const refreshToken = req.cookies?.refreshToken;
-      if (!refreshToken) {
-        throw new APIError('You must be login!', 401);
-      }
-
-      jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY, (err, payload) => {
-        if (err) {
-          throw new APIError('Invalid refresh token!', 403);
-        }
-
-        // generate new token
-        const newAccessToken = jwt.sign(
-          { id: payload.id },
-          process.env.JWT_ACCESS_KEY,
-          { expiresIn: '30s' },
-        );
-        const newRefreshToken = jwt.sign(
-          { id: payload.id },
-          process.env.JWT_REFRESH_KEY,
-          { expiresIn: '300s' },
-        );
-
-        // store token in cookies
-        res.cookie('accessToken', newAccessToken, {
-          // httpOnly: true,
-          // secure: true,
-          // path: '/',
-          // sameSite: 'Strict',
-        });
-
-        res.cookie('refreshToken', newRefreshToken, {
-          // httpOnly: true,
-          // secure: true,
-          // path: '/',
-          // sameSite: 'Strict',
-        });
-
-        return res.status(200).json({
-          message: 'Refresh token successfully!',
-          accessToken: newAccessToken,
-          refreshToken: newRefreshToken,
-        });
-      });
     } catch (error) {
       next(error);
     }
@@ -127,16 +70,16 @@ const authController = {
   logout: async (req, res, next) => {
     try {
       res.clearCookie('accessToken', {
-        // httpOnly: true,
-        // secure: true,
-        // path: '/',
-        // sameSite: 'Strict',
+        httpOnly: true,
+        secure: process.env.COOKIES_SECURE_DEV || true,
+        sameSite: 'None',
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000
       });
-      res.clearCookie('refreshToken', {
-        // httpOnly: true,
-        // secure: true,
-        // path: '/',
-        // sameSite: 'Strict',
+      res.clearCookie('userId', {
+        httpOnly: true,
+        secure: process.env.COOKIES_SECURE_DEV || true,
+        sameSite: 'None',
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000
       });
       return res.status(200).json({ message: 'Log out successfully!' });
     } catch (error) {
