@@ -1,4 +1,6 @@
+const mongoose = require('mongoose');
 const Subject = require('../models/Subject');
+const Question = require('../models/Question');
 
 const subjectController = {
   // [POST] /subject/create
@@ -96,6 +98,64 @@ const subjectController = {
       }
 
       return res.status(200).json(subjects);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // [PATCH] /subject/update/:subjectId
+  update: async (req, res, next) => {
+    try {
+      const userId = req.cookies?.userId;
+      const { subjectId } = req.params;
+      const { name, group } = req.body;
+
+      // check for valid subjectId
+      if (!mongoose.Types.ObjectId.isValid(subjectId)) {
+        return res.status(400).json({ message: 'Invalid subjectId!' });
+      }
+
+      // update subject
+      const subject = await Subject.findOneAndUpdate(
+        { _id: subjectId, userId },
+        { name, group },
+        { new: true },
+      )
+        .lean()
+        .select('-questions');
+      if (!subject) {
+        return res.status(404).json({ message: 'Subject not found!' });
+      }
+
+      return res.status(200).json(subject);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // [DELETE] /subject/delete/:subjectId
+  delete: async (req, res, next) => {
+    try {
+      const userId = req.cookies?.userId;
+      const { subjectId } = req.params;
+
+      // check for valid subjectId
+      if (!mongoose.Types.ObjectId.isValid(subjectId)) {
+        return res.status(400).json({ message: 'Invalid subjectId!' });
+      }
+
+      // find subject
+      const subject = await Subject.findOne({ _id: subjectId, userId });
+      if (!subject) {
+        return res.status(404).json({ message: 'Subject not found!' });
+      }
+
+      // delete all questions of subject
+      await Question.deleteMany({ subjectId });
+      // delete subject
+      await Subject.findOneAndDelete({ _id: subjectId, userId });
+
+      return res.status(200).json({ message: 'Delete successfully!' });
     } catch (error) {
       next(error);
     }
