@@ -81,7 +81,7 @@ const subjectController = {
     }
   },
 
-  // [GET] /subject/search
+  // [POST] /subject/search
   search: async (req, res, next) => {
     try {
       const { query } = req.body;
