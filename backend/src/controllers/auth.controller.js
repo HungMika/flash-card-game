@@ -40,32 +40,23 @@ const authController = {
         const accessToken = jwt.sign(
           { id: user._id },
           process.env.JWT_ACCESS_KEY,
-          { expiresIn: '1h' },
+          { expiresIn: '30d' },
         );
-        // const refreshToken = jwt.sign(
-        //   { id: user._id },
-        //   process.env.JWT_REFRESH_KEY,
-        //   { expiresIn: '7d' },
-        // );
 
         // store token in cookies
         res.cookie('accessToken', accessToken, {
-          // httpOnly: true,
-          // secure: true,
-          // sameSite: 'Strict',
+          httpOnly: true,
+          secure: process.env.COOKIES_SECURE_DEV || true,
+          sameSite: 'None',
+          maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000 (ms)
         });
-
-        // res.cookie('refreshToken', refreshToken, {
-        //   // httpOnly: true,
-        //   // secure: true,
-        //   // sameSite: 'Strict',
-        // });
 
         const { _id, password, ...others } = user._doc;
         res.cookie('userId', _id, {
-          // httpOnly: true,
-          // secure: true,
-          // sameSite: 'Strict',
+          httpOnly: true,
+          secure: process.env.COOKIES_SECURE_DEV || true,
+          sameSite: 'None',
+          maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000
         });
 
         return res.status(200).json({ ...others });
@@ -75,73 +66,20 @@ const authController = {
     }
   },
 
-  // [POST] /auth/refresh
-  refreshToken: async (req, res, next) => {
-    try {
-      // take refresh token form user
-      const refreshToken = req.cookies?.refreshToken;
-      if (!refreshToken) {
-        return res.status(401).json({ message: 'You must be login!' });
-      }
-
-      jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY, (err, payload) => {
-        if (err) {
-          return res.status(403).json({ message: 'Invalid token!' });
-        }
-
-        // generate new token
-        const newAccessToken = jwt.sign(
-          { id: payload.id },
-          process.env.JWT_ACCESS_KEY,
-          { expiresIn: '1h' },
-        );
-        const newRefreshToken = jwt.sign(
-          { id: payload.id },
-          process.env.JWT_REFRESH_KEY,
-          { expiresIn: '7d' },
-        );
-
-        // store token in cookies
-        res.cookie('accessToken', newAccessToken, {
-          // httpOnly: true,
-          // secure: true,
-          // sameSite: 'Strict',
-        });
-
-        res.cookie('refreshToken', newRefreshToken, {
-          // httpOnly: true,
-          // secure: true,
-          // sameSite: 'Strict',
-        });
-
-        return res.status(200).json({
-          message: 'Refresh token successfully!',
-          accessToken: newAccessToken,
-          refreshToken: newRefreshToken,
-        });
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
-
   // [POST] /auth/logout
   logout: async (req, res, next) => {
     try {
       res.clearCookie('accessToken', {
-        // httpOnly: true,
-        // secure: true,
-        // sameSite: 'Strict',
+        httpOnly: true,
+        secure: process.env.COOKIES_SECURE_DEV || true,
+        sameSite: 'None',
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000
       });
-      // res.clearCookie('refreshToken', {
-      //   // httpOnly: true,
-      //   // secure: true,
-      //   // sameSite: 'Strict',
-      // });
       res.clearCookie('userId', {
-        // httpOnly: true,
-        // secure: true,
-        // sameSite: 'Strict',
+        httpOnly: true,
+        secure: process.env.COOKIES_SECURE_DEV || true,
+        sameSite: 'None',
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000
       });
       return res.status(200).json({ message: 'Log out successfully!' });
     } catch (error) {
