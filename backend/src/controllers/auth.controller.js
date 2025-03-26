@@ -5,6 +5,7 @@ const User = require('../models/User');
 const { validateRegister, validateLogin } = require('../utils/auth');
 
 require('dotenv').config();
+const cookiesSecure = process.env.COOKIES_SECURE === 'true';
 
 const authController = {
   // [POST] /auth/register
@@ -46,7 +47,7 @@ const authController = {
         // store token in cookies
         res.cookie('accessToken', accessToken, {
           httpOnly: true,
-          secure: process.env.COOKIES_SECURE === 'true',
+          secure: cookiesSecure,
           sameSite: 'None',
           maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000 (ms)
         });
@@ -54,7 +55,7 @@ const authController = {
         const { _id, password, ...others } = user._doc;
         res.cookie('userId', _id, {
           httpOnly: true,
-          secure: process.env.COOKIES_SECURE === 'true',
+          secure: cookiesSecure,
           sameSite: 'None',
           maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000 (ms)
         });
@@ -71,12 +72,12 @@ const authController = {
     try {
       res.clearCookie('accessToken', {
         httpOnly: true,
-        secure: process.env.COOKIES_SECURE === 'true',
+        secure: cookiesSecure,
         sameSite: 'None',
       });
       res.clearCookie('userId', {
         httpOnly: true,
-        secure: process.env.COOKIES_SECURE === 'true',
+        secure: cookiesSecure,
         sameSite: 'None',
       });
       return res.status(200).json({ message: 'Log out successfully!' });
