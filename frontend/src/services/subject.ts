@@ -44,11 +44,10 @@ export const getSubjectByUserId = async () => {
 //search subjects
 export const searchSubjects = async (query: string) => {
   try {
-    const res = await axios.get(
+    const res = await axios.post(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/subject/search`,
-      {
-        params: { query },
-      },
+      { query },
+      { withCredentials: true },
     );
     return res.data;
   } catch (error: any) {
@@ -71,5 +70,41 @@ export const createSubject = async (
     return res.data;
   } catch (error: any) {
     throw new Error(error.res?.data?.message || 'Failed to create subject');
+  }
+};
+
+//update subjects for teachers
+export const updateSubject = async (
+  userId: string,
+  subjectId: string,
+  name: string,
+  group: string,
+) => {
+  try {
+    const res = await axios.patch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/subject/update/${subjectId}`,
+      { name, group },
+      { withCredentials: true },
+    );
+    return res.data;
+  } catch (error: any) {
+    throw new Error(error.res?.data?.message || 'Failed to update subject');
+  }
+};
+
+//delete subjects for teachers
+export const deleteSubject = async (subjectId: string) => {
+  try {
+    const res = await axios.delete(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/subject/delete/${subjectId}`,
+      {
+        withCredentials: true,
+      },
+    );
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || 'Failed to delete subject',
+    );
   }
 };
