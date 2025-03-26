@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Dialog,
   DialogTrigger,
@@ -28,15 +28,21 @@ export const AddSubjectModal = ({
 }: AddSubjectModalProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const subjectNameRef = useRef<HTMLInputElement | null>(null);
 
   console.log('User in AddSubjectModal:', user);
+
+  useEffect(() => {
+    const storedUserId = getCookie('userId');
+    console.log('Fetched userId from cookie:', storedUserId);
+    setUserId(storedUserId || null);
+  }, []);
 
   const handleAdd = async () => {
     const subjectName = subjectNameRef.current?.value.trim();
     if (!subjectName) return;
 
-    const userId = getCookie('userId');
     console.log('User ID:', userId);
 
     if (!userId) {
@@ -69,7 +75,10 @@ export const AddSubjectModal = ({
         </DialogHeader>
 
         <div className="space-y-4 mt-2">
-          <Input ref={subjectNameRef} placeholder="Tên subject (VD: Toán, Khoa học...)" />
+          <Input
+            ref={subjectNameRef}
+            placeholder="Tên subject (VD: Toán, Khoa học...)"
+          />
         </div>
 
         <DialogFooter className="mt-6">
