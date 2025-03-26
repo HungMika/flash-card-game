@@ -110,6 +110,13 @@ const subjectController = {
         return res.status(400).json({ message: 'Invalid subjectId!' });
       }
 
+      const subjectInGroup = await Subject.findOne({ name, group });
+      if (subjectInGroup) {
+        return res
+          .status(400)
+          .json({ message: 'Subject name already exists in this group!' });
+      }
+
       // update subject
       const subject = await Subject.findOneAndUpdate(
         { _id: subjectId, userId },

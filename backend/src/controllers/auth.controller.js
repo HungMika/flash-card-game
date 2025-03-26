@@ -46,7 +46,7 @@ const authController = {
         // store token in cookies
         res.cookie('accessToken', accessToken, {
           httpOnly: true,
-          secure: process.env.COOKIES_SECURE_DEV || true,
+          secure: process.env.COOKIES_SECURE,
           sameSite: 'None',
           maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000 (ms)
         });
@@ -54,9 +54,9 @@ const authController = {
         const { _id, password, ...others } = user._doc;
         res.cookie('userId', _id, {
           httpOnly: true,
-          secure: process.env.COOKIES_SECURE_DEV || true,
+          secure: process.env.COOKIES_SECURE,
           sameSite: 'None',
-          maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000
+          maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000 (ms)
         });
 
         return res.status(200).json({ ...others });
@@ -71,15 +71,13 @@ const authController = {
     try {
       res.clearCookie('accessToken', {
         httpOnly: true,
-        secure: process.env.COOKIES_SECURE_DEV || true,
+        secure: process.env.COOKIES_SECURE,
         sameSite: 'None',
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000
       });
       res.clearCookie('userId', {
         httpOnly: true,
-        secure: process.env.COOKIES_SECURE_DEV || true,
+        secure: process.env.COOKIES_SECURE,
         sameSite: 'None',
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000
       });
       return res.status(200).json({ message: 'Log out successfully!' });
     } catch (error) {
