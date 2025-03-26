@@ -10,11 +10,11 @@ const subjectController = {
       const { name, group } = req.body;
 
       // check existing name
-      const existingName = await Subject.findOne({ name });
-      if (existingName) {
+      const subjectInGroup = await Subject.findOne({ name, group });
+      if (subjectInGroup) {
         return res
           .status(400)
-          .json({ message: 'Subject name already exists!' });
+          .json({ message: 'Subject name already exists in this group!' });
       }
 
       // save subject
