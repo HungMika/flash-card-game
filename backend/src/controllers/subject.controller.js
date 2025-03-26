@@ -34,7 +34,7 @@ const subjectController = {
   // [GET] /subject/show/all
   showAll: async (req, res, next) => {
     try {
-      const subjects = await Subject.find().lean().select('-questions');
+      const subjects = await Subject.find().lean();
       if (!subjects) {
         return res.status(404).json({ message: 'No subjects found!' });
       }
@@ -49,9 +49,7 @@ const subjectController = {
   showByGroup: async (req, res, next) => {
     try {
       const { group } = req.params;
-      const subjects = await Subject.find({ group })
-        .lean()
-        .select('-questions');
+      const subjects = await Subject.find({ group }).lean();
       if (!subjects.length) {
         return res.status(404).json({ message: 'No subjects found!' });
       }
@@ -68,9 +66,7 @@ const subjectController = {
       const userId = req.cookies?.userId;
 
       // find by userId
-      const subjects = await Subject.find({ userId })
-        .lean()
-        .select('-questions');
+      const subjects = await Subject.find({ userId }).lean();
       if (!subjects.length) {
         return res.status(404).json({ message: 'No subjects found!' });
       }
@@ -89,10 +85,9 @@ const subjectController = {
       const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const regexPattern = new RegExp(safeQuery, 'i');
 
-      const subjects = await Subject.find({ name: { $regex: regexPattern } })
-        .lean()
-        .select('-questions');
-
+      const subjects = await Subject.find({
+        name: { $regex: regexPattern },
+      }).lean();
       if (!subjects.length) {
         return res.status(404).json({ message: 'Subject not found!' });
       }
@@ -120,9 +115,7 @@ const subjectController = {
         { _id: subjectId, userId },
         { name, group },
         { new: true },
-      )
-        .lean()
-        .select('-questions');
+      ).lean();
       if (!subject) {
         return res.status(404).json({ message: 'Subject not found!' });
       }
