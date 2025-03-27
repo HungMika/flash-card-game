@@ -22,7 +22,7 @@ export const AgeGroupSelector = ({
           variant={age === selectedAge ? 'default' : 'outline'}
           onClick={() => onSelect(age)}
         >
-          lớp {age}
+          Group {age}
         </Button>
       ))}
     </div>

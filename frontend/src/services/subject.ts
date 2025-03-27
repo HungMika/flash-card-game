@@ -58,14 +58,13 @@ export const searchSubjects = async (query: string) => {
 
 //create subjects for teachers
 export const createSubject = async (
-  userId: string,
   name: string,
   group: string,
 ) => {
   try {
     const res = await axios.post(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/subject/create`,
-      { userId, name, group },
+      { name, group },
       { withCredentials: true },
     );
     return res.data;
@@ -76,7 +75,6 @@ export const createSubject = async (
 
 //update subjects for teachers
 export const updateSubject = async (
-  userId: string,
   subjectId: string,
   name: string,
   group: string,

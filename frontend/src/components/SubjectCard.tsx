@@ -1,11 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Trash2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { deleteSubject, updateSubject } from '@/services/subject';
-import { getCookie } from '@/lib/cookie';
 import Link from 'next/link';
 import {
   Dialog,
@@ -42,11 +41,9 @@ export const SubjectCard = ({
     'This action cannot be undone',
   );
 
-  const userId = getCookie('userId');
-
   const handleDelete = async () => {
     const confirmed = await confirm();
-    if (!confirmed || !userId) return;
+    if (!confirmed) return;
     try {
       await deleteSubject(id);
       onChange();
@@ -56,9 +53,9 @@ export const SubjectCard = ({
   };
 
   const handleEdit = async () => {
-    if (!newName.trim() || !newAgeGroup.trim() || !userId) return;
+    if (!newName.trim() || !newAgeGroup.trim()) return;
     try {
-      await updateSubject(userId, id, newName.trim(), newAgeGroup.trim());
+      await updateSubject(id, newName.trim(), newAgeGroup.trim());
       setEditOpen(false);
       onChange();
     } catch (error) {

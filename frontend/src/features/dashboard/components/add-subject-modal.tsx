@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Dialog,
   DialogTrigger,
@@ -13,7 +13,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 import { createSubject } from '@/services/subject';
-import { getCookie } from '@/lib/cookie';
 
 interface AddSubjectModalProps {
   user: { _id: string };
@@ -28,31 +27,17 @@ export const AddSubjectModal = ({
 }: AddSubjectModalProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
   const subjectNameRef = useRef<HTMLInputElement | null>(null);
 
   console.log('User in AddSubjectModal:', user);
-
-  useEffect(() => {
-    const storedUserId = getCookie('userId');
-    console.log('Fetched userId from cookie:', storedUserId);
-    setUserId(storedUserId || null);
-  }, []);
 
   const handleAdd = async () => {
     const subjectName = subjectNameRef.current?.value.trim();
     if (!subjectName) return;
 
-    console.log('User ID:', userId);
-
-    if (!userId) {
-      console.error('Không tìm thấy userId trong cookie.');
-      return;
-    }
-
     setLoading(true);
     try {
-      await createSubject(userId, subjectName, ageGroup);
+      await createSubject(subjectName, ageGroup);
       subjectNameRef.current!.value = ''; // Clear input
       setOpen(false);
       onSubjectAdded();

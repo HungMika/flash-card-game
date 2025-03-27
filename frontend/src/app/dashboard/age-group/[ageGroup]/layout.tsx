@@ -1,4 +1,4 @@
-import { SubjectHeader } from '@/features/subject/subject-header';
+import { QuestionHeader } from '@/features/question/question-header';
 import React from 'react';
 
 export default async function AgeGroupLayout({
@@ -11,10 +11,7 @@ export default async function AgeGroupLayout({
   const ageParams = await params;
   return (
     <div className="p-6 space-y-4 ">
-      <SubjectHeader />
-      <div className="text-1xl font-bold">
-        Nhóm lớp: {ageParams.ageGroup}
-      </div>
+      <QuestionHeader />
       {children}
     </div>
   );
