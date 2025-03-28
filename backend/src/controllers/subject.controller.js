@@ -80,13 +80,14 @@ const subjectController = {
   // [POST] /subject/search
   search: async (req, res, next) => {
     try {
-      const { query } = req.body;
+      const { name, group } = req.body;
 
-      const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const safeQuery = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const regexPattern = new RegExp(safeQuery, 'i');
 
       const subjects = await Subject.find({
         name: { $regex: regexPattern },
+        group,
       }).lean();
       if (!subjects.length) {
         return res.status(404).json({ message: 'Subject not found!' });
