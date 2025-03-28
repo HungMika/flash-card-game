@@ -50,6 +50,30 @@ const questionController = {
     }
   },
 
+  // [POST] / question/search/:subjectId
+  search: async (req, res, next) => {
+    try {
+      const { subjectId } = req.params;
+      const { query } = req.body;
+
+      const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regexPattern = new RegExp(safeQuery, 'i');
+
+      const question = await Question.find({
+        subjectId,
+        title: { $regex: regexPattern },
+      });
+
+      if (!question.length) {
+        return res.status(404).json({ message: 'Question not found!' });
+      }
+
+      return res.status(200).json(question);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   // [PATCH] /question/update/:questionId
   update: async (req, res, next) => {
     try {
