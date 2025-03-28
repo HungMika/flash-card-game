@@ -72,15 +72,23 @@ export default function DashboardPage() {
   }, [selectedAge]);
 
   // SEARCH SUBJECTS
+  // SEARCH SUBJECTS
   useEffect(() => {
+    if (!selectedAge) return; // Không tìm kiếm nếu chưa chọn nhóm tuổi
+
     if (!debouncedSearchQuery) {
+      // Nếu input rỗng -> Lấy toàn bộ subject của group
       getSubjectByGroup(selectedAge).then(setSubjects);
       return;
     }
 
     async function fetchSearchResults() {
       try {
-        const searchResults = await searchSubjects(debouncedSearchQuery);
+        // ✅ Truyền đúng 2 tham số vào searchSubjects
+        const searchResults = await searchSubjects(
+          debouncedSearchQuery,
+          selectedAge,
+        );
         setSubjects(searchResults);
       } catch (error) {
         console.error('cannot find subjects:', error);

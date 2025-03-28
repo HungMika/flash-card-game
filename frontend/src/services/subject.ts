@@ -43,11 +43,11 @@ export const getSubjectByUserId = async () => {
 };
 
 //search subjects
-export const searchSubjects = async (query: string) => {
+export const searchSubjects = async (name: string, group: string) => {
   try {
     const res = await axios.post(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/subject/search`,
-      { query },
+      { name, group },
       { withCredentials: true },
     );
     return res.data;
@@ -57,10 +57,7 @@ export const searchSubjects = async (query: string) => {
 };
 
 //create subjects for teachers
-export const createSubject = async (
-  name: string,
-  group: string,
-) => {
+export const createSubject = async (name: string, group: string) => {
   try {
     const res = await axios.post(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/subject/create`,
