@@ -49,7 +49,7 @@ const authController = {
         res.cookie('accessToken', accessToken, {
           httpOnly: true,
           secure: cookiesSecure,
-          sameSite: 'None',
+          sameSite: process.env.COOKIES_SAME_SITE,
           maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000 (ms)
         });
 
@@ -57,7 +57,7 @@ const authController = {
         res.cookie('userId', _id, {
           httpOnly: true,
           secure: cookiesSecure,
-          sameSite: 'None',
+          sameSite: process.env.COOKIES_SAME_SITE,
           maxAge: 30 * 24 * 60 * 60 * 1000, // 30d * 24h * 60m * 60s * 1000 (ms)
         });
 
@@ -74,12 +74,12 @@ const authController = {
       res.clearCookie('accessToken', {
         httpOnly: true,
         secure: cookiesSecure,
-        sameSite: 'None',
+        sameSite: process.env.COOKIES_SAME_SITE,
       });
       res.clearCookie('userId', {
         httpOnly: true,
         secure: cookiesSecure,
-        sameSite: 'None',
+        sameSite: process.env.COOKIES_SAME_SITE,
       });
       return res.status(200).json({ message: 'Log out successfully!' });
     } catch (error) {
