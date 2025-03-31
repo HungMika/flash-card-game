@@ -1,1 +1,1 @@
-export type SignInflow = 'SignIn' | 'SignUp';
+export type SignInflow = 'SignIn' | 'SignUp' | 'ForgotPassword';

@@ -1,11 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Trash2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { deleteSubject, updateSubjectName } from '@/services/api';
-import { getUser } from '@/lib/storage';
+import { deleteSubject, updateSubject } from '@/services/subject';
 import Link from 'next/link';
 import {
   Dialog,
@@ -17,6 +16,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useConfirm } from './use-confirm';
+
+const ageGroups = ['1-2', '3-5', '6-8', '9-12'];
 
 interface SubjectCardProps {
   id: string;
@@ -33,27 +34,33 @@ export const SubjectCard = ({
 }: SubjectCardProps) => {
   const [editOpen, setEditOpen] = useState(false);
   const [newName, setNewName] = useState(name);
+  const [newAgeGroup, setNewAgeGroup] = useState(ageGroup);
 
   const [ConfirmDialog, confirm] = useConfirm(
     'Are you sure?',
-    'this action cannot be undone',
+    'This action cannot be undone',
   );
-
-  const user = getUser();
 
   const handleDelete = async () => {
     const confirmed = await confirm();
-    if (!user) return;
     if (!confirmed) return;
-    await deleteSubject(id, user.id);
-    onChange();
+    try {
+      await deleteSubject(id);
+      onChange();
+    } catch (error) {
+      console.error('Error deleting subject:', error);
+    }
   };
 
   const handleEdit = async () => {
-    if (!user || !newName.trim()) return;
-    await updateSubjectName(id, newName.trim(), user.id);
-    setEditOpen(false);
-    onChange();
+    if (!newName.trim() || !newAgeGroup.trim()) return;
+    try {
+      await updateSubject(id, newName.trim(), newAgeGroup.trim());
+      setEditOpen(false);
+      onChange();
+    } catch (error) {
+      console.error('Error updating subject:', error);
+    }
   };
 
   return (
@@ -83,6 +90,22 @@ export const SubjectCard = ({
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Tên mới"
               />
+              <div className="mt-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Age Group
+                </label>
+                <select
+                  value={newAgeGroup}
+                  onChange={(e) => setNewAgeGroup(e.target.value)}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                >
+                  {ageGroups.map((group) => (
+                    <option key={group} value={group}>
+                      {group}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <DialogFooter className="mt-4">
                 <Button onClick={handleEdit}>Save</Button>
               </DialogFooter>

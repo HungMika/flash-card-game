@@ -47,3 +47,26 @@ export async function logOut() {
   );
   return res.data;
 }
+
+//API 1: Forgot Password - send email to user with reset token
+export async function forgotPassword(email: string) {
+  const res = await axios.post(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/forgot-password`,
+    { email },
+    { withCredentials: true },
+  );
+  return res.data;
+}
+
+//API 2: Reset Password - update password
+export async function resetPassword(token: string, newPassword: string) {
+  const res = await axios.post(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/reset-password`,
+    { newPassword },
+    {
+      params: { token },
+      withCredentials: true,
+    },
+  );
+  return res.data;
+}
