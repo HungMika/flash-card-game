@@ -7,6 +7,7 @@ import { resetPassword } from '@/services/auth';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Eye, EyeOff } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function ResetPasswordCard() {
   const searchParams = useSearchParams();
@@ -43,7 +44,7 @@ export default function ResetPasswordCard() {
     try {
       setPending(true);
       await resetPassword(token || '', newPassword);
-      alert('Password reset successfully!');
+      toast.success('Password reset successfully!');
       router.push('/auth');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to reset password!');

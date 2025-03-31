@@ -7,6 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { getQuestionsBySubject } from '@/services/question';
 import Dice from '@/components/dice/dice';
 import { CircleArrowLeft, Loader } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface Question {
   _id: string;
@@ -38,7 +39,7 @@ export default function GameplayPage() {
 
       setQuestions(shuffleArray(data));
     } catch (error) {
-      console.error(error);
+      toast.error('Không thể tải câu hỏi!'); // ✅ Thông báo lỗi khi fetch thất bại
     } finally {
       setLoading(false);
     }
@@ -63,8 +64,8 @@ export default function GameplayPage() {
     );
 
     if (remainingQuestions.length === 0) {
-      alert('Hoàn thành tất cả câu hỏi!');
-      router.back();
+      toast.success('Hoàn thành tất cả câu hỏi!'); // ✅ Thông báo hoàn thành
+      setTimeout(() => router.back(), 3000); // ✅ Quay lại sau 1.5s
       return;
     }
 

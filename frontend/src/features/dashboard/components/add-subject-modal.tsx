@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 import { createSubject } from '@/services/subject';
+import toast from 'react-hot-toast';
 
 interface AddSubjectModalProps {
   user: { _id: string };
@@ -38,6 +39,7 @@ export const AddSubjectModal = ({
     setLoading(true);
     try {
       await createSubject(subjectName, ageGroup);
+      toast.success('Subject added successfully!');
       subjectNameRef.current!.value = ''; // Clear input
       setOpen(false);
       onSubjectAdded();

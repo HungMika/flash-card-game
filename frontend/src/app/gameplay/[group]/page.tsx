@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { BiSolidLeftArrowCircle } from 'react-icons/bi';
 import { getSubjectByGroup } from '@/services/subject';
-import { Loader } from 'lucide-react';
+import { Loader2, Rabbit } from 'lucide-react';
 
 type Subject = {
   _id: string;
@@ -18,6 +18,7 @@ export default function GroupPage() {
   const router = useRouter();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingSubject, setLoadingSubject] = useState<string | null>(null);
 
   useEffect(() => {
     if (!group) return;
@@ -28,7 +29,8 @@ export default function GroupPage() {
         const data = await getSubjectByGroup(group);
         setSubjects(data);
       } catch (error) {
-        console.error('Failed to fetch subjects:', error);
+        return [];
+        //console.error('Failed to fetch subjects:', error);
       } finally {
         setLoading(false);
       }
@@ -38,13 +40,14 @@ export default function GroupPage() {
   }, [group]);
 
   const handleSelectSubject = (subjectId: string) => {
+    setLoadingSubject(subjectId);
     router.push(`/gameplay/${group}/${subjectId}`);
   };
 
   if (loading) {
     return (
       <div className="h-full flex-1 flex items-center justify-center flex-col gap-2">
-        <Loader className="size-6 animate-spin text-muted-foreground" />
+        <Rabbit className="size-6 animate-bounce text-blue-500" />
       </div>
     );
   }
@@ -66,14 +69,19 @@ export default function GroupPage() {
         <div className="w-full overflow-hidden">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto p-2 scrollbar-hide">
             {subjects.map((subject) => (
-              <div
+              <button
                 key={subject._id}
                 className="bg-white border border-gray-300 p-4 rounded-lg text-lg font-semibold 
-                text-center shadow-md hover:shadow-lg transition cursor-pointer hover:bg-gray-100"
+                text-center shadow-md hover:shadow-lg transition cursor-pointer hover:bg-gray-100 relative"
                 onClick={() => handleSelectSubject(subject._id)}
+                disabled={loadingSubject === subject._id}
               >
-                {subject.name}
-              </div>
+                {loadingSubject === subject._id ? (
+                  <Loader2 className="animate-spin text-muted-foreground mx-auto" />
+                ) : (
+                  subject.name
+                )}
+              </button>
             ))}
           </div>
         </div>

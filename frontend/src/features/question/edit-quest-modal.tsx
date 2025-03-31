@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { CheckCircleIcon, Plus, Trash2 } from 'lucide-react';
 import { updateQuestion } from '@/services/question';
+import toast from 'react-hot-toast';
 
 interface EditQuestionModalProps {
   question: {
@@ -69,28 +70,29 @@ export const EditQuestionModal = ({
       !trimmedCorrectAnswer ||
       filteredWrongAnswer.length === 0
     ) {
-      alert('Please fill all fields!');
+      toast.error('Please fill all the fields.');
       return;
     }
 
     setLoading(true);
     try {
-      console.log('Updating question:', {
-        title: trimmedTitle,
-        correctAnswer: trimmedCorrectAnswer,
-        wrongAnswer: filteredWrongAnswer,
-      });
+      // console.log('Updating question:', {
+      //   title: trimmedTitle,
+      //   correctAnswer: trimmedCorrectAnswer,
+      //   wrongAnswer: filteredWrongAnswer,
+      // });
 
       await updateQuestion(question!._id, {
         title: trimmedTitle,
         correctAnswer: trimmedCorrectAnswer,
         wrongAnswer: filteredWrongAnswer,
       });
-
+      toast.success('Updated successfully.');
       onClose();
       onQuestionUpdated();
     } catch (error) {
-      console.error('Error updating question:', error);
+      toast.error('Error updating question.');
+      //console.error('Error updating question:', error);
     } finally {
       setLoading(false);
     }

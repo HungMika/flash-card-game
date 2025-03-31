@@ -9,6 +9,7 @@ import { AddSubjectModal } from '@/features/dashboard/components/add-subject-mod
 import { getCurrUser } from '@/services/user';
 import { useRouter } from 'next/navigation';
 import useDebounce from '@/hooks/use-debounce';
+import toast from 'react-hot-toast';
 
 type Subject = {
   _id: string;
@@ -44,11 +45,12 @@ export default function DashboardPage() {
         if (userData) {
           setUser(userData);
         } else {
-          alert('User data not found.');
+          toast.error('User data not found.');
           router.replace('/auth');
         }
       } catch (error) {
-        console.error('Cannot get user:', error);
+        toast.error('Error fetching user data.');
+        //console.error('Cannot get user:', error);
       }
     }
 
@@ -64,14 +66,13 @@ export default function DashboardPage() {
         const subjectsData = await getSubjectByGroup(selectedAge);
         setSubjects(subjectsData);
       } catch (error) {
-        console.error(`LCannot get subject by ${selectedAge}:`, error);
+        //console.error(`Cannot get subject by ${selectedAge}:`, error);
       }
     }
 
     fetchSubjectByGroup();
   }, [selectedAge]);
 
-  // SEARCH SUBJECTS
   // SEARCH SUBJECTS
   useEffect(() => {
     if (!selectedAge) return; // Không tìm kiếm nếu chưa chọn nhóm tuổi
@@ -91,7 +92,7 @@ export default function DashboardPage() {
         );
         setSubjects(searchResults);
       } catch (error) {
-        console.error('cannot find subjects:', error);
+        //console.error('cannot find subjects:', error);
       }
     }
 

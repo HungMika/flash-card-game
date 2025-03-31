@@ -8,7 +8,8 @@ export const getQuestionsBySubject = async (subjectId: string) => {
     );
     return res.data;
   } catch (error) {
-    throw new Error('Failed to fetch questions by subject');
+    return [];
+    //throw new Error('Failed to fetch questions by subject');
   }
 };
 

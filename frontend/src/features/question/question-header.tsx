@@ -15,7 +15,7 @@ export const QuestionHeader = () => {
         onClick={() => router.back()}
         className="text-blue-600 hover:text-blue-800 transition-transform transform hover:scale-110"
       >
-        <BiSolidLeftArrowCircle className="text-3xl" />
+        <BiSolidLeftArrowCircle className="text-3xl hover:text-3.5xl" />
       </button>
 
       <div className="flex-1 text-center text-lg font-semibold text-gray-700">

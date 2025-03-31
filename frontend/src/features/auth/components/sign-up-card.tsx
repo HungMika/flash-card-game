@@ -16,6 +16,7 @@ import { useState, useRef } from 'react';
 import { signUp } from '@/services/auth';
 import { useRouter } from 'next/navigation';
 import { SignInflow } from '../api/auth-types';
+import toast from 'react-hot-toast';
 
 interface SignUpCardProps {
   setstate: (state: SignInflow) => void;
@@ -73,6 +74,7 @@ export const SignUpCard = ({ setstate }: SignUpCardProps) => {
     setPending(true);
     try {
       await signUp(username, email, password);
+      toast.success('Account created successfully.');
       setstate('SignIn');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Something went wrong!');
