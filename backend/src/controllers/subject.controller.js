@@ -60,13 +60,14 @@ const subjectController = {
     }
   },
 
-  // [GET] /subject/show
+  // [GET] /subject/show/my/:group
   show: async (req, res, next) => {
     try {
       const userId = req.cookies?.userId;
+      const { group } = req.params;
 
       // find by userId
-      const subjects = await Subject.find({ userId }).lean();
+      const subjects = await Subject.find({ userId, group }).lean();
       if (!subjects.length) {
         return res.status(404).json({ message: 'No subjects found!' });
       }
