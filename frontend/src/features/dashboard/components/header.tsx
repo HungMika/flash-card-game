@@ -1,11 +1,12 @@
 'use client';
+import toast from 'react-hot-toast';
+
+import { logOut } from '@/services/auth';
+import { MdLogout } from 'react-icons/md';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { useConfirm } from '@/components/use-confirm';
-import { removeUser } from '@/lib/storage';
-import { logOut } from '@/services/auth';
-import { useRouter } from 'next/navigation';
-import { MdLogout } from 'react-icons/md';
 
 interface User {
   _id: string;
@@ -21,7 +22,7 @@ export const DashboardHeader = ({ user }: DashboardHeaderProps) => {
   const router = useRouter();
   const [ConfirmDialog, confirm] = useConfirm(
     'Do you want to log out?',
-    'please confirm, see you later 👋',
+    'Please confirm, see you later 👋',
   );
 
   const handleLogOut = async () => {
@@ -29,10 +30,10 @@ export const DashboardHeader = ({ user }: DashboardHeaderProps) => {
     if (!confirmed) return;
     try {
       await logOut();
-      removeUser();
       router.replace('/auth');
     } catch (error) {
-      console.error('Error while logging out:', error);
+      toast.error('Something went wrong while logging out.');
+      //console.error('Error while logging out:', error);
     }
   };
 

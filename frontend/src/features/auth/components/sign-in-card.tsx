@@ -11,7 +11,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
-import { FcGoogle } from 'react-icons/fc';
 import { Eye, EyeOff, TriangleAlert } from 'lucide-react';
 
 import { useState } from 'react';
@@ -20,6 +19,7 @@ import { SignInflow } from '../api/auth-types';
 
 import { setUser } from '@/lib/storage';
 import { logIn } from '@/services/auth';
+import toast from 'react-hot-toast';
 
 interface SignInCardProps {
   setstate: (state: SignInflow) => void;
@@ -47,6 +47,7 @@ export const SignInCard = ({ setstate }: SignInCardProps) => {
     //TODO: call signIn api here
     try {
       const user = await logIn(username, password);
+      toast.success('Logged in successfully.');
 
       setUser(user);
       router.push('/dashboard');

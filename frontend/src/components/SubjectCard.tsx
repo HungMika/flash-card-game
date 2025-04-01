@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useConfirm } from './use-confirm';
+import toast from 'react-hot-toast';
 
 const ageGroups = ['1-2', '3-5', '6-8', '9-12'];
 
@@ -46,9 +47,11 @@ export const SubjectCard = ({
     if (!confirmed) return;
     try {
       await deleteSubject(id);
+      toast.success('Subject deleted successfully');
       onChange();
     } catch (error) {
-      console.error('Error deleting subject:', error);
+      toast.error('Error deleting subject');
+      //console.error('Error deleting subject:', error);
     }
   };
 
@@ -56,10 +59,12 @@ export const SubjectCard = ({
     if (!newName.trim() || !newAgeGroup.trim()) return;
     try {
       await updateSubject(id, newName.trim(), newAgeGroup.trim());
+      toast.success('Subject updated successfully');
       setEditOpen(false);
       onChange();
     } catch (error) {
-      console.error('Error updating subject:', error);
+      toast.error('Error updating subject');
+      //console.error('Error updating subject:', error);
     }
   };
 

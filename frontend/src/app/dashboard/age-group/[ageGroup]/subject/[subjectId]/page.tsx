@@ -9,6 +9,7 @@ import { QuestionCard } from '@/components/QuestionCard';
 import { EditQuestionModal } from '@/features/question/edit-quest-modal';
 import { useConfirm } from '@/components/use-confirm';
 import { Loader } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 type Question = {
   _id: string;
@@ -35,9 +36,9 @@ export default function SubjectPage() {
       try {
         const data = await getQuestionsBySubject(subjectId as string);
         setQuestions(data ?? []);
-        console.log('GET questions:', data);
+        //console.log('GET questions:', data);
       } catch (error) {
-        console.error('Error on GET questions:', error);
+        //console.error('Error on GET questions:', error);
         setQuestions([]);
       }
       setLoading(false);
@@ -51,6 +52,7 @@ export default function SubjectPage() {
     if (!confirmed) return;
 
     await deleteQuestion(id);
+    toast.success('Question deleted successfully');
     setQuestions((prev) => prev.filter((q) => q._id !== id));
   };
   if (loading) {

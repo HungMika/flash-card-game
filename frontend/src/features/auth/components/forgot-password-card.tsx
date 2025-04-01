@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { forgotPassword } from '@/services/auth';
 
 import { SignInflow } from '../api/auth-types';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 interface SignInCardProps {
   setstate: (state: SignInflow) => void;
@@ -12,13 +13,15 @@ interface SignInCardProps {
 
 export const ForgotPasswordCard = ({ setstate }: SignInCardProps) => {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const emailRef = useRef<HTMLInputElement>(null); // Dùng useRef thay vì useState
   const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
 
   const handleForgotPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
+
+    const email = emailRef.current?.value.trim(); // Lấy giá trị từ useRef
 
     if (!email) {
       return setError('Please enter your email!');
@@ -27,7 +30,7 @@ export const ForgotPasswordCard = ({ setstate }: SignInCardProps) => {
     try {
       setPending(true);
       await forgotPassword(email);
-      alert('Please check your email to reset your password.');
+      toast.success('Please check your email to reset your password.');
       router.push('/auth');
     } catch (err: any) {
       setError(
@@ -50,8 +53,7 @@ export const ForgotPasswordCard = ({ setstate }: SignInCardProps) => {
         <input
           type="email"
           placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          ref={emailRef}
           className="border border-gray-300 rounded-md p-2 w-full mb-4"
           disabled={pending}
         />

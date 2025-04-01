@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { CheckCircleIcon, Plus, Trash2 } from 'lucide-react';
 import { createQuestion } from '@/services/question';
+import toast from 'react-hot-toast';
 
 interface AddQuestionModalProps {
   subjectId: string;
@@ -49,29 +50,31 @@ export const AddQuestionModal = ({
       .filter((ans) => ans !== '');
 
     if (!title || !correctAnswer || filteredwrongAnswer.length === 0) {
-      alert('please fill all fields!');
+      toast.error('please fill all fields!');
       return;
     }
 
     setLoading(true);
     try {
-      console.log('create API call:', {
-        title,
-        correctAnswer,
-        wrongAnswer: filteredwrongAnswer,
-      });
+      // console.log('create API call:', {
+      //   title,
+      //   correctAnswer,
+      //   wrongAnswer: filteredwrongAnswer,
+      // });
       await createQuestion(subjectId, {
         title,
         correctAnswer,
         wrongAnswer: filteredwrongAnswer,
       });
+      toast.success('Question added successfully!');
       setOpen(false);
       titleRef.current!.value = '';
       correctAnswerRef.current!.value = '';
       setwrongAnswer(['']);
       onQuestionAdded();
     } catch (error) {
-      console.error('Error while creating:', error);
+      toast.error('Something went wrong!');
+      //console.error('Error while creating:', error);
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import { Toaster } from 'react-hot-toast';
 
 // Khai báo biến CSS từ Google Fonts
 const geistSans = Geist({
@@ -26,6 +27,7 @@ export default function RootLayout({
   return (
     <html lang="vi" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="antialiased bg-white text-black dark:bg-zinc-900 dark:text-white">
+        <Toaster position="top-center" reverseOrder={false} />
         {children}
       </body>
     </html>
