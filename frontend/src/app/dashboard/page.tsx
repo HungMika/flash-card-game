@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { getSubjectByGroup, searchSubjects } from '@/services/subject';
+import { getSubjectByUserId, searchSubjects } from '@/services/subject';
 import { AgeGroupSelector } from '@/components/AgeGroupSelector';
 import { DashboardHeader } from '@/features/dashboard/components/header';
 import { SubjectCard } from '@/components/SubjectCard';
@@ -29,6 +29,7 @@ export default function DashboardPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false); // State Loader
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const hasFetchedRef = useRef(false);
 
@@ -50,7 +51,6 @@ export default function DashboardPage() {
         }
       } catch (error) {
         toast.error('Error fetching user data.');
-        //console.error('Cannot get user:', error);
       }
     }
 
@@ -62,11 +62,14 @@ export default function DashboardPage() {
     if (!selectedAge) return;
 
     async function fetchSubjectByGroup() {
+      setIsLoading(true);
       try {
-        const subjectsData = await getSubjectByGroup(selectedAge);
+        const subjectsData = await getSubjectByUserId(selectedAge);
         setSubjects(subjectsData);
       } catch (error) {
-        //console.error(`Cannot get subject by ${selectedAge}:`, error);
+        toast.error('Error fetching subjects.');
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -75,24 +78,25 @@ export default function DashboardPage() {
 
   // SEARCH SUBJECTS
   useEffect(() => {
-    if (!selectedAge) return; // Không tìm kiếm nếu chưa chọn nhóm tuổi
+    if (!selectedAge) return;
 
     if (!debouncedSearchQuery) {
-      // Nếu input rỗng -> Lấy toàn bộ subject của group
-      getSubjectByGroup(selectedAge).then(setSubjects);
+      getSubjectByUserId(selectedAge).then(setSubjects);
       return;
     }
 
     async function fetchSearchResults() {
+      setIsLoading(true); // Hiển thị loader khi tìm kiếm
       try {
-        // ✅ Truyền đúng 2 tham số vào searchSubjects
         const searchResults = await searchSubjects(
           debouncedSearchQuery,
           selectedAge,
         );
         setSubjects(searchResults);
       } catch (error) {
-        //console.error('cannot find subjects:', error);
+        toast.error('Error searching subjects.');
+      } finally {
+        setIsLoading(false); // Tắt loader sau khi tìm kiếm
       }
     }
 
@@ -112,46 +116,56 @@ export default function DashboardPage() {
 
         {selectedAge && (
           <div className="relative border rounded-lg p-4 flex flex-col max-h-[480px]">
-            {/* Search Input */}
-            <input
-              type="text"
-              placeholder="Search subjects..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-            />
+            {/* Hiển thị loader nếu đang load */}
+            {isLoading ? (
+              <div className="flex justify-center items-center h-32">
+                <div className="loader border-t-4 border-blue-500 rounded-full w-8 h-8 animate-spin"></div>
+                <p className="ml-2">Loading...</p>
+              </div>
+            ) : (
+              <>
+                {/* Search Input */}
+                <input
+                  type="text"
+                  placeholder="Search subjects..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                />
 
-            <div className="overflow-y-auto flex-1 mb-4">
-              {subjects.length === 0 ? (
-                <p className="text-center text-muted-foreground">
-                  No subjects found.
-                </p>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {subjects.map((subject) => (
-                    <SubjectCard
-                      key={subject._id}
-                      id={subject._id}
-                      name={subject.name}
-                      ageGroup={subject.group}
-                      onChange={() =>
-                        getSubjectByGroup(selectedAge).then(setSubjects)
-                      }
-                    />
-                  ))}
+                <div className="overflow-y-auto flex-1 mb-4">
+                  {subjects.length === 0 ? (
+                    <p className="text-center text-muted-foreground">
+                      No subjects found.
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {subjects.map((subject) => (
+                        <SubjectCard
+                          key={subject._id}
+                          id={subject._id}
+                          name={subject.name}
+                          ageGroup={subject.group}
+                          onChange={() =>
+                            getSubjectByUserId(selectedAge).then(setSubjects)
+                          }
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            <div className="mt-auto flex justify-center">
-              <AddSubjectModal
-                user={user}
-                ageGroup={selectedAge}
-                onSubjectAdded={() =>
-                  getSubjectByGroup(selectedAge).then(setSubjects)
-                }
-              />
-            </div>
+                <div className="mt-auto flex justify-center">
+                  <AddSubjectModal
+                    user={user}
+                    ageGroup={selectedAge}
+                    onSubjectAdded={() =>
+                      getSubjectByUserId(selectedAge).then(setSubjects)
+                    }
+                  />
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>

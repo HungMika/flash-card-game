@@ -35,7 +35,7 @@ export const QuestionCard = ({
         className="flex items-center justify-between p-4 border rounded-lg shadow-sm bg-white cursor-pointer w-full"
         onClick={() => setOpen(true)}
       >
-        <div className="flex-1">
+        <div className="flex-1 max-w-[60%] overflow-hidden">
           <p className="text-md font-normal text-gray-800 truncate">
             {question.title}
           </p>

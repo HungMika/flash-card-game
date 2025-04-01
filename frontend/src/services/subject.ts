@@ -28,10 +28,10 @@ export const getSubjectByGroup = async (group: string) => {
 };
 
 //GET by userid for teachers
-export const getSubjectByUserId = async () => {
+export const getSubjectByUserId = async (group: string) => {
   try {
     const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/subject/show`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/subject/show/my/${group}`,
       { withCredentials: true },
     );
     return res.data;
