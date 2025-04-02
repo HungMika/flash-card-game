@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Trash2, Pencil } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { deleteSubject, updateSubjectName } from "@/services/api";
-import { getTeacher } from "@/lib/storage";
-import Link from "next/link";
+import { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Trash2, Pencil } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { deleteSubject, updateSubjectName } from '@/services/api';
+import { getUser } from '@/lib/storage';
+import Link from 'next/link';
 import {
   Dialog,
   DialogTrigger,
@@ -14,9 +14,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { useConfirm } from "./use-confirm";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { useConfirm } from './use-confirm';
 
 interface SubjectCardProps {
   id: string;
@@ -35,23 +35,23 @@ export const SubjectCard = ({
   const [newName, setNewName] = useState(name);
 
   const [ConfirmDialog, confirm] = useConfirm(
-    "Are you sure?",
-    "this action cannot be undone"
+    'Are you sure?',
+    'this action cannot be undone',
   );
 
-  const teacher = getTeacher();
+  const user = getUser();
 
   const handleDelete = async () => {
     const confirmed = await confirm();
-    if (!teacher) return;
+    if (!user) return;
     if (!confirmed) return;
-    await deleteSubject(id, teacher.id);
+    await deleteSubject(id, user.id);
     onChange();
   };
 
   const handleEdit = async () => {
-    if (!teacher || !newName.trim()) return;
-    await updateSubjectName(id, newName.trim(), teacher.id);
+    if (!user || !newName.trim()) return;
+    await updateSubjectName(id, newName.trim(), user.id);
     setEditOpen(false);
     onChange();
   };

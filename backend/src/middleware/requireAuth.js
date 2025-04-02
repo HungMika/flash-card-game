@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const verifyToken = (req, res, next) => {
+const requireAuth = (req, res, next) => {
   try {
     const accessToken = req.cookies?.accessToken;
     if (!accessToken) {
@@ -9,7 +9,7 @@ const verifyToken = (req, res, next) => {
 
     jwt.verify(accessToken, process.env.JWT_ACCESS_KEY, (err, payload) => {
       if (err) {
-        return res.status(403).json({ message: 'Token is not valid!' });
+        return res.status(403).json({ message: 'Invalid token!' });
       }
 
       req.user = payload;
@@ -20,4 +20,4 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-module.exports = verifyToken;
+module.exports = requireAuth;
