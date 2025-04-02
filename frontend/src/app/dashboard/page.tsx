@@ -1,14 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { getSubjectByUserId, searchSubjects } from '@/services/subject';
+import { useState, useEffect, useRef } from 'react';
+import { getSubjectByUserId } from '@/services/subject';
 import { AgeGroupSelector } from '@/components/AgeGroupSelector';
 import { DashboardHeader } from '@/features/dashboard/components/header';
 import { SubjectCard } from '@/components/SubjectCard';
 import { AddSubjectModal } from '@/features/dashboard/components/add-subject-modal';
 import { getCurrUser } from '@/services/user';
 import { useRouter } from 'next/navigation';
-import useDebounce from '@/hooks/use-debounce';
 import toast from 'react-hot-toast';
 
 type Subject = {
@@ -28,42 +27,23 @@ export default function DashboardPage() {
   const [selectedAge, setSelectedAge] = useState<string>('');
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [user, setUser] = useState<User | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false); // State Loader
-  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const hasFetchedRef = useRef(false);
 
   const router = useRouter();
 
-  const fetchSubjects = useCallback(async (ageGroup: string) => {
+  const fetchSubjects = async (ageGroup: string) => {
     setIsLoading(true);
     try {
       const subjectsData = await getSubjectByUserId(ageGroup);
       setSubjects(subjectsData);
     } catch (error) {
-      toast.error('Error fetching subjects.');
+      //toast.error('Error fetching subjects.');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
-  const fetchSearchResults = useCallback(async () => {
-    if (!selectedAge) return;
-    setIsLoading(true);
-    try {
-      const searchResults = await searchSubjects(
-        debouncedSearchQuery,
-        selectedAge,
-      );
-      setSubjects(searchResults);
-    } catch (error) {
-      toast.error('Error searching subjects.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [debouncedSearchQuery, selectedAge]);
-
-  // GET CURRENT USER FROM API
   useEffect(() => {
     if (hasFetchedRef.current) return;
     hasFetchedRef.current = true;
@@ -85,29 +65,25 @@ export default function DashboardPage() {
     fetchUser();
   }, []);
 
-  // GET SUBJECTS BY AGE GROUP
   useEffect(() => {
     if (!selectedAge) return;
-    fetchSubjects(selectedAge);
-  }, [selectedAge, fetchSubjects]);
 
-  // SEARCH SUBJECTS
-  useEffect(() => {
-    if (!selectedAge) return;
-    if (!debouncedSearchQuery) {
-      fetchSubjects(selectedAge);
-    } else {
-      fetchSearchResults();
-    }
-  }, [debouncedSearchQuery, selectedAge, fetchSearchResults, fetchSubjects]);
+    // Reset subjects before fetching new ones
+    setSubjects([]);
 
-  const handleSubjectAdded = useCallback(() => {
     fetchSubjects(selectedAge);
-  }, [selectedAge, fetchSubjects]);
+  }, [selectedAge]);
 
-  const handleSubjectChange = useCallback(() => {
-    fetchSubjects(selectedAge);
-  }, [selectedAge, fetchSubjects]);
+  const handleSubjectAdded = () => {
+    fetchSubjects(selectedAge); // Lấy lại danh sách subjects sau khi thêm subject mới
+  };
+
+  const handleSubjectDeleted = async (subjectId: string) => {
+    // Cập nhật trực tiếp trong state sau khi xoá
+    setSubjects((prevSubjects) =>
+      prevSubjects.filter((subject) => subject._id !== subjectId),
+    );
+  };
 
   if (!user) return null;
 
@@ -122,7 +98,6 @@ export default function DashboardPage() {
 
         {selectedAge && (
           <div className="relative border rounded-lg p-4 flex flex-col max-h-[480px]">
-            {/* Hiển thị loader nếu đang load */}
             {isLoading ? (
               <div className="flex justify-center items-center h-32">
                 <div className="loader border-t-4 border-blue-500 rounded-full w-8 h-8 animate-spin"></div>
@@ -130,15 +105,6 @@ export default function DashboardPage() {
               </div>
             ) : (
               <>
-                {/* Search Input */}
-                <input
-                  type="text"
-                  placeholder="Search subjects..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                />
-
                 <div className="overflow-y-auto flex-1 mb-4">
                   {subjects.length === 0 ? (
                     <p className="text-center text-muted-foreground">
@@ -152,7 +118,7 @@ export default function DashboardPage() {
                           id={subject._id}
                           name={subject.name}
                           ageGroup={subject.group}
-                          onChange={handleSubjectChange}
+                          onChange={() => handleSubjectDeleted(subject._id)}
                         />
                       ))}
                     </div>

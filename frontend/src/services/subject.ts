@@ -7,8 +7,8 @@ export const getAllSubjects = async () => {
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/subject/show/all`,
     );
     return res.data;
-  } catch (error: any) {
-    throw new Error(error.res?.data?.message || 'Failed to fetch subjects');
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -19,7 +19,7 @@ export const getSubjectByGroup = async (group: string) => {
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/subject/show/${group}`,
     );
     return res.data;
-  } catch (error: any) {
+  } catch (error) {
     return [];
     // throw new Error(
     //   error.res?.data?.message || 'Failed to fetch subjects by groups',
@@ -51,8 +51,8 @@ export const searchSubjects = async (name: string, group: string) => {
       { withCredentials: true },
     );
     return res.data;
-  } catch (error: any) {
-    throw new Error(error.res?.data?.message || 'Failed to search subjects');
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -65,8 +65,8 @@ export const createSubject = async (name: string, group: string) => {
       { withCredentials: true },
     );
     return res.data;
-  } catch (error: any) {
-    throw new Error(error.res?.data?.message || 'Failed to create subject');
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -83,8 +83,8 @@ export const updateSubject = async (
       { withCredentials: true },
     );
     return res.data;
-  } catch (error: any) {
-    throw new Error(error.res?.data?.message || 'Failed to update subject');
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -98,9 +98,7 @@ export const deleteSubject = async (subjectId: string) => {
       },
     );
     return res.data;
-  } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || 'Failed to delete subject',
-    );
+  } catch (error) {
+    console.log(error);
   }
 };
