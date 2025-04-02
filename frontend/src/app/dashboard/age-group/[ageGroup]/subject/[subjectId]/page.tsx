@@ -2,7 +2,6 @@
 
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { getQuestionsBySubject, deleteQuestion } from '@/services/question';
 import { AddQuestionModal } from '@/features/question/add-quest-modal';
 import { QuestionCard } from '@/components/QuestionCard';
@@ -19,7 +18,7 @@ type Question = {
 };
 
 export default function SubjectPage() {
-  const { ageGroup, subjectId } = useParams();
+  const { subjectId } = useParams();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
@@ -38,7 +37,7 @@ export default function SubjectPage() {
         setQuestions(data ?? []);
         //console.log('GET questions:', data);
       } catch (error) {
-        //console.error('Error on GET questions:', error);
+        console.log(error);
         setQuestions([]);
       }
       setLoading(false);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { getSubjectByUserId, searchSubjects } from '@/services/subject';
 import { AgeGroupSelector } from '@/components/AgeGroupSelector';
 import { DashboardHeader } from '@/features/dashboard/components/header';
