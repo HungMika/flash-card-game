@@ -10,14 +10,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { TriangleAlert } from 'lucide-react';
+import { TriangleAlert, Eye, EyeOff } from 'lucide-react';
 
-import { useState } from 'react';
-// Đổi import
+import { useState, useRef } from 'react';
 import { signUp } from '@/services/auth';
-import { setUser } from '@/lib/storage';
 import { useRouter } from 'next/navigation';
 import { SignInflow } from '../api/auth-types';
+import toast from 'react-hot-toast';
 
 interface SignUpCardProps {
   setstate: (state: SignInflow) => void;
@@ -30,8 +29,22 @@ export const SignUpCard = ({ setstate }: SignUpCardProps) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const router = useRouter();
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const confirmPasswordRef = useRef<HTMLInputElement>(null);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+    passwordRef.current?.focus();
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+    confirmPasswordRef.current?.focus();
+  };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,20 +73,18 @@ export const SignUpCard = ({ setstate }: SignUpCardProps) => {
 
     setPending(true);
     try {
-      const newUser = await signUp(username, email, password);
-      console.log('Registered user:', newUser);
-
+      await signUp(username, email, password);
+      toast.success('Account created successfully.');
       setstate('SignIn');
     } catch (err: any) {
-      const backendError = err.response?.data?.message;
-      setError(backendError || 'Something went wrong!');
+      setError(err.response?.data?.message || 'Something went wrong!');
     } finally {
       setPending(false);
     }
   };
 
   return (
-    <Card className="w-full h-full p-8">
+    <Card className="w-full h-full p-8 max-w-md mx-auto mt-20">
       <CardHeader className="px-0 pt-0">
         <CardTitle>Create your new account</CardTitle>
         <CardDescription>
@@ -106,22 +117,50 @@ export const SignUpCard = ({ setstate }: SignUpCardProps) => {
             disabled={pending}
             required
           />
-          <Input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={pending}
-            required
-          />
-          <Input
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            disabled={pending}
-            required
-          />
+          <div className="relative">
+            <Input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={pending}
+              ref={passwordRef}
+              required
+            />
+            {showPassword ? (
+              <EyeOff
+                className="absolute right-3 top-2 cursor-pointer"
+                onClick={togglePasswordVisibility}
+              />
+            ) : (
+              <Eye
+                className="absolute right-3 top-2 cursor-pointer"
+                onClick={togglePasswordVisibility}
+              />
+            )}
+          </div>
+          <div className="relative">
+            <Input
+              type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={pending}
+              ref={confirmPasswordRef}
+              required
+            />
+            {showConfirmPassword ? (
+              <EyeOff
+                className="absolute right-3 top-2 cursor-pointer"
+                onClick={toggleConfirmPasswordVisibility}
+              />
+            ) : (
+              <Eye
+                className="absolute right-3 top-2 cursor-pointer"
+                onClick={toggleConfirmPasswordVisibility}
+              />
+            )}
+          </div>
           <Button type="submit" className="w-full" size="lg" disabled={pending}>
             Create Account
           </Button>

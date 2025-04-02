@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Dialog,
   DialogTrigger,
@@ -12,34 +12,40 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
-import { createSubject } from '@/services/api';
-import { getUser } from '@/lib/storage';
+import { createSubject } from '@/services/subject';
+import toast from 'react-hot-toast';
 
 interface AddSubjectModalProps {
+  user: { _id: string };
   ageGroup: string;
   onSubjectAdded: () => void;
 }
 
 export const AddSubjectModal = ({
+  user,
   ageGroup,
   onSubjectAdded,
 }: AddSubjectModalProps) => {
   const [open, setOpen] = useState(false);
-  const [subjectName, setSubjectName] = useState('');
   const [loading, setLoading] = useState(false);
+  const subjectNameRef = useRef<HTMLInputElement | null>(null);
 
-  const teacherId = getUser()?.id || '';
+  //console.log('User in AddSubjectModal:', user);
 
   const handleAdd = async () => {
-    if (!subjectName.trim()) return;
+    const subjectName = subjectNameRef.current?.value.trim();
+    if (!subjectName) return;
+
     setLoading(true);
     try {
-      await createSubject(subjectName, ageGroup, teacherId);
-      setSubjectName('');
+      await createSubject(subjectName, ageGroup);
+      toast.success('Subject added successfully!');
+      subjectNameRef.current!.value = ''; // Clear input
       setOpen(false);
       onSubjectAdded();
     } catch (error) {
-      console.error('Lỗi khi thêm subject:', error);
+      //console.error('Lỗi khi thêm subject:', error);
+      toast.error('Lỗi khi thêm subject.');
     } finally {
       setLoading(false);
     }
@@ -58,9 +64,8 @@ export const AddSubjectModal = ({
 
         <div className="space-y-4 mt-2">
           <Input
+            ref={subjectNameRef}
             placeholder="Tên subject (VD: Toán, Khoa học...)"
-            value={subjectName}
-            onChange={(e) => setSubjectName(e.target.value)}
           />
         </div>
 

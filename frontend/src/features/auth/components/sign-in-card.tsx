@@ -11,8 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
-import { FcGoogle } from 'react-icons/fc';
-import { TriangleAlert } from 'lucide-react';
+import { Eye, EyeOff, TriangleAlert } from 'lucide-react';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -20,6 +19,7 @@ import { SignInflow } from '../api/auth-types';
 
 import { setUser } from '@/lib/storage';
 import { logIn } from '@/services/auth';
+import toast from 'react-hot-toast';
 
 interface SignInCardProps {
   setstate: (state: SignInflow) => void;
@@ -28,6 +28,7 @@ interface SignInCardProps {
 export const SignInCard = ({ setstate }: SignInCardProps) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
 
@@ -46,6 +47,7 @@ export const SignInCard = ({ setstate }: SignInCardProps) => {
     //TODO: call signIn api here
     try {
       const user = await logIn(username, password);
+      toast.success('Logged in successfully.');
 
       setUser(user);
       router.push('/dashboard');
@@ -57,10 +59,6 @@ export const SignInCard = ({ setstate }: SignInCardProps) => {
     } finally {
       setPending(false);
     }
-  };
-
-  const onGoogleSignIn = () => {
-    alert('test: Sign in with google');
   };
 
   return (
@@ -87,14 +85,22 @@ export const SignInCard = ({ setstate }: SignInCardProps) => {
             type="text"
             placeholder="User name"
           />
-          <Input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={pending}
-            type="password"
-            placeholder="Password"
-          />
+          <div className="relative">
+            <Input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={pending}
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+            />
+            <div
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-muted-foreground"
+            >
+              {showPassword ? <EyeOff /> : <Eye />}
+            </div>
+          </div>
           <Button
             type="submit"
             className="w-full"
@@ -107,16 +113,12 @@ export const SignInCard = ({ setstate }: SignInCardProps) => {
         <Separator />
 
         <div className="flex flex-col gap-y-2.5">
-          <Button
-            disabled={pending}
-            onClick={onGoogleSignIn}
-            className="w-full relative"
-            variant={'outline'}
-            size="lg"
+          <p
+            className="text-center text-sm underline text-blue-400 hover:text-blue-500 cursor-pointer"
+            onClick={() => setstate('ForgotPassword')}
           >
-            <FcGoogle className="size-5 absolute top-3 left-2.5" />
-            Continue with Google
-          </Button>
+            Forgot your password?
+          </p>
         </div>
         <p className="text-xs text-muted-foreground">
           Don&apos;t have an account?{' '}
