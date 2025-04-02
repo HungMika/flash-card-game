@@ -32,10 +32,8 @@ export const ForgotPasswordCard = ({ setstate }: SignInCardProps) => {
       await forgotPassword(email);
       toast.success('Please check your email to reset your password.');
       router.push('/auth');
-    } catch (err: any) {
-      setError(
-        err.response?.data?.message || 'Failed to send reset password email',
-      );
+    } catch (error) {
+      setError('Failed to send reset password email');
     } finally {
       setPending(false);
     }

@@ -27,7 +27,7 @@ export const QuestionCard = ({
   onDelete,
 }: QuestionCardProps) => {
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  //const [loading, setLoading] = useState(false);
 
   return (
     <>

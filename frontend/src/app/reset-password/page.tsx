@@ -46,8 +46,8 @@ export default function ResetPasswordCard() {
       await resetPassword(token || '', newPassword);
       toast.success('Password reset successfully!');
       router.push('/auth');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to reset password!');
+    } catch (error) {
+      setError('Failed to reset password!');
     } finally {
       setPending(false);
     }
