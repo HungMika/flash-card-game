@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 import {
   Dialog,
@@ -8,8 +8,8 @@ import {
   DialogTrigger,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 export const useConfirm = (
   title: string,
@@ -40,7 +40,7 @@ export const useConfirm = (
 
   const ConfirmDialog = () => (
     <Dialog open={promise !== null} onOpenChange={handleCancel}>
-      <DialogContent className="bg-white">
+      <DialogContent className="bg-white w-[90vw] max-w-sm sm:max-w-md rounded-lg">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{message}</DialogDescription>

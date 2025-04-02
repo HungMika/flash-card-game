@@ -1,0 +1,59 @@
+/* dice.css */
+
+/* Vùng chứa xí ngầu với hiệu ứng 3D */
+.dice-container {
+    width: 100px;
+    height: 100px;
+    perspective: 500px; /* Giảm góc nhìn cho phù hợp với kích thước nhỏ hơn */
+    cursor: pointer;
+}
+
+.dice {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transform: rotateX(0deg) rotateY(0deg);
+    transition: transform 1s ease-in-out;
+}
+
+.dice.rolling {
+    animation: spin3d 1s linear infinite;
+}
+
+@keyframes spin3d {
+    0% {
+        transform: rotateX(0deg) rotateY(0deg);
+    }
+    100% {
+        transform: rotateX(360deg) rotateY(360deg);
+    }
+}
+
+.face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 80px; /* Giảm font size để phù hợp với kích thước mới */
+    color: #1e90ff;
+
+    backface-visibility: hidden;
+    box-shadow: 0 0 0 8px #1e90ff inset; /* Giảm viền cho cân đối */
+}
+
+.face svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Định vị các mặt của xí ngầu */
+.face-1 { transform: rotateY(0deg) translateZ(50px); }
+.face-2 { transform: rotateY(90deg) translateZ(50px); }
+.face-3 { transform: rotateY(180deg) translateZ(50px); }
+.face-4 { transform: rotateY(-90deg) translateZ(50px); }
+.face-5 { transform: rotateX(90deg) translateZ(50px); }
+.face-6 { transform: rotateX(-90deg) translateZ(50px); }

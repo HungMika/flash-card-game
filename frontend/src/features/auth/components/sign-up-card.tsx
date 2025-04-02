@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Card,
@@ -6,59 +6,87 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { TriangleAlert } from "lucide-react";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { TriangleAlert, Eye, EyeOff } from 'lucide-react';
 
-import { useState } from "react";
-import { signUp } from "@/services/api";
-import { setTeacher } from "@/lib/storage";
-import { useRouter } from "next/navigation";
-import { SignInflow } from "../api/auth-types";
+import { useState, useRef } from 'react';
+import { signUp } from '@/services/auth';
+import { useRouter } from 'next/navigation';
+import { SignInflow } from '../api/auth-types';
+import toast from 'react-hot-toast';
 
 interface SignUpCardProps {
   setstate: (state: SignInflow) => void;
 }
 
 export const SignUpCard = ({ setstate }: SignUpCardProps) => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const router = useRouter();
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const confirmPasswordRef = useRef<HTMLInputElement>(null);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+    passwordRef.current?.focus();
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+    confirmPasswordRef.current?.focus();
+  };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
+    setError('');
+
+    if (!username || !email || !password || !confirmPassword) {
+      setError('Please fill all the fields.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Email is not valid.');
+      return;
+    }
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long.');
+      return;
+    }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError('Passwords do not match.');
       return;
     }
 
     setPending(true);
     try {
-      const newTeacher = await signUp(username, email, password);
-      console.log("Signed up successfully:", newTeacher);
-
-      setTeacher(newTeacher);
-      router.push("/dashboard");
+      await signUp(username, email, password);
+      toast.success('Account created successfully.');
+      setstate('SignIn');
     } catch (err: any) {
-      setError("Sign up failed");
+      setError(err.response?.data?.message || 'Something went wrong!');
     } finally {
       setPending(false);
     }
   };
 
   return (
-    <Card className="w-full h-full p-8">
+    <Card className="w-full h-full p-8 max-w-md mx-auto mt-20">
       <CardHeader className="px-0 pt-0">
-        <CardTitle>Create your teacher account</CardTitle>
+        <CardTitle>Create your new account</CardTitle>
         <CardDescription>
           Sign up to manage your flash game modules
         </CardDescription>
@@ -89,22 +117,50 @@ export const SignUpCard = ({ setstate }: SignUpCardProps) => {
             disabled={pending}
             required
           />
-          <Input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={pending}
-            required
-          />
-          <Input
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            disabled={pending}
-            required
-          />
+          <div className="relative">
+            <Input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={pending}
+              ref={passwordRef}
+              required
+            />
+            {showPassword ? (
+              <EyeOff
+                className="absolute right-3 top-2 cursor-pointer"
+                onClick={togglePasswordVisibility}
+              />
+            ) : (
+              <Eye
+                className="absolute right-3 top-2 cursor-pointer"
+                onClick={togglePasswordVisibility}
+              />
+            )}
+          </div>
+          <div className="relative">
+            <Input
+              type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={pending}
+              ref={confirmPasswordRef}
+              required
+            />
+            {showConfirmPassword ? (
+              <EyeOff
+                className="absolute right-3 top-2 cursor-pointer"
+                onClick={toggleConfirmPasswordVisibility}
+              />
+            ) : (
+              <Eye
+                className="absolute right-3 top-2 cursor-pointer"
+                onClick={toggleConfirmPasswordVisibility}
+              />
+            )}
+          </div>
           <Button type="submit" className="w-full" size="lg" disabled={pending}>
             Create Account
           </Button>
@@ -113,10 +169,10 @@ export const SignUpCard = ({ setstate }: SignUpCardProps) => {
         <Separator />
 
         <p className="text-xs text-muted-foreground">
-          Already have an account?{" "}
+          Already have an account?{' '}
           <span
             className="text-sky-700 hover:underline cursor-pointer"
-            onClick={() => setstate("SignIn")}
+            onClick={() => setstate('SignIn')}
           >
             Sign in
           </span>
