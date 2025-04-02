@@ -1,32 +1,33 @@
+// frontend/middleware.ts
+import { getCurrUser } from '@/services/user';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('accessToken');
 
+  // 🟢 Nếu không có accessToken -> Chuyển về /auth
   if (!accessToken) {
     return NextResponse.redirect(new URL('/auth', request.url));
   }
 
   try {
-    const apiResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/profile`,
-      {
-        headers: { Authorization: `Bearer ${accessToken.value}` },
-        credentials: 'include',
-      },
-    );
+    const userData = await getCurrUser();
 
-    if (!apiResponse.ok) {
+    if (!userData) {
       return NextResponse.redirect(new URL('/auth', request.url));
     }
+
+    if (request.nextUrl.pathname === '/auth') {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+
+    return NextResponse.next();
   } catch (error) {
     console.error('Error verifying accessToken:', error);
     return NextResponse.redirect(new URL('/auth', request.url));
   }
-
-  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  matcher: ['/dashboard/:path*', '/auth'],
 };

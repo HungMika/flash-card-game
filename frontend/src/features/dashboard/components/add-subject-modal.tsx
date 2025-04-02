@@ -30,7 +30,7 @@ export const AddSubjectModal = ({
   const [loading, setLoading] = useState(false);
   const subjectNameRef = useRef<HTMLInputElement | null>(null);
 
-  console.log('User in AddSubjectModal:', user);
+  //console.log('User in AddSubjectModal:', user);
 
   const handleAdd = async () => {
     const subjectName = subjectNameRef.current?.value.trim();
@@ -44,7 +44,8 @@ export const AddSubjectModal = ({
       setOpen(false);
       onSubjectAdded();
     } catch (error) {
-      console.error('Lỗi khi thêm subject:', error);
+      //console.error('Lỗi khi thêm subject:', error);
+      toast.error('Lỗi khi thêm subject.');
     } finally {
       setLoading(false);
     }

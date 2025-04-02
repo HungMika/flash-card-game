@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { getSubjectByUserId, searchSubjects } from '@/services/subject';
 import { AgeGroupSelector } from '@/components/AgeGroupSelector';
 import { DashboardHeader } from '@/features/dashboard/components/header';
@@ -35,6 +35,34 @@ export default function DashboardPage() {
 
   const router = useRouter();
 
+  const fetchSubjects = useCallback(async (ageGroup: string) => {
+    setIsLoading(true);
+    try {
+      const subjectsData = await getSubjectByUserId(ageGroup);
+      setSubjects(subjectsData);
+    } catch (error) {
+      toast.error('Error fetching subjects.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const fetchSearchResults = useCallback(async () => {
+    if (!selectedAge) return;
+    setIsLoading(true);
+    try {
+      const searchResults = await searchSubjects(
+        debouncedSearchQuery,
+        selectedAge,
+      );
+      setSubjects(searchResults);
+    } catch (error) {
+      toast.error('Error searching subjects.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [debouncedSearchQuery, selectedAge]);
+
   // GET CURRENT USER FROM API
   useEffect(() => {
     if (hasFetchedRef.current) return;
@@ -60,48 +88,26 @@ export default function DashboardPage() {
   // GET SUBJECTS BY AGE GROUP
   useEffect(() => {
     if (!selectedAge) return;
-
-    async function fetchSubjectByGroup() {
-      setIsLoading(true);
-      try {
-        const subjectsData = await getSubjectByUserId(selectedAge);
-        setSubjects(subjectsData);
-      } catch (error) {
-        toast.error('Error fetching subjects.');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchSubjectByGroup();
-  }, [selectedAge]);
+    fetchSubjects(selectedAge);
+  }, [selectedAge, fetchSubjects]);
 
   // SEARCH SUBJECTS
   useEffect(() => {
     if (!selectedAge) return;
-
     if (!debouncedSearchQuery) {
-      getSubjectByUserId(selectedAge).then(setSubjects);
-      return;
+      fetchSubjects(selectedAge);
+    } else {
+      fetchSearchResults();
     }
+  }, [debouncedSearchQuery, selectedAge, fetchSearchResults, fetchSubjects]);
 
-    async function fetchSearchResults() {
-      setIsLoading(true); // Hiển thị loader khi tìm kiếm
-      try {
-        const searchResults = await searchSubjects(
-          debouncedSearchQuery,
-          selectedAge,
-        );
-        setSubjects(searchResults);
-      } catch (error) {
-        toast.error('Error searching subjects.');
-      } finally {
-        setIsLoading(false); // Tắt loader sau khi tìm kiếm
-      }
-    }
+  const handleSubjectAdded = useCallback(() => {
+    fetchSubjects(selectedAge);
+  }, [selectedAge, fetchSubjects]);
 
-    fetchSearchResults();
-  }, [debouncedSearchQuery, selectedAge]);
+  const handleSubjectChange = useCallback(() => {
+    fetchSubjects(selectedAge);
+  }, [selectedAge, fetchSubjects]);
 
   if (!user) return null;
 
@@ -146,9 +152,7 @@ export default function DashboardPage() {
                           id={subject._id}
                           name={subject.name}
                           ageGroup={subject.group}
-                          onChange={() =>
-                            getSubjectByUserId(selectedAge).then(setSubjects)
-                          }
+                          onChange={handleSubjectChange}
                         />
                       ))}
                     </div>
@@ -159,9 +163,7 @@ export default function DashboardPage() {
                   <AddSubjectModal
                     user={user}
                     ageGroup={selectedAge}
-                    onSubjectAdded={() =>
-                      getSubjectByUserId(selectedAge).then(setSubjects)
-                    }
+                    onSubjectAdded={handleSubjectAdded}
                   />
                 </div>
               </>

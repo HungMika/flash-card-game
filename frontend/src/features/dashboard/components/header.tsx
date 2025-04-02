@@ -51,10 +51,10 @@ export const DashboardHeader = ({ user }: DashboardHeaderProps) => {
         </div>
         <Button
           variant="outline"
-          className="border-red-500"
+          className="border-red-500 hover:bg-red-500 text-red-500 hover:text-white"
           onClick={handleLogOut}
         >
-          <MdLogout className="w-6 h-6 text-red-500" />
+          <MdLogout className="w-6 h-6 " />
         </Button>
       </header>
     </>
