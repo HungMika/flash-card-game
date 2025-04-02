@@ -3,10 +3,9 @@ import React from 'react';
 
 export default function AgeGroupLayout({
   children,
-  params,
 }: {
   children: React.ReactNode;
-  params: { ageGroup: string };
+  //params: { ageGroup: string };
 }) {
   return (
     <div className="p-6 space-y-4">
