@@ -48,9 +48,11 @@ export default function GroupPage() {
     return (
       <div className="h-full flex-1 flex items-center justify-center flex-col gap-4">
         <div className="flex items-end gap-4">
-          <Rabbit className="size-10 text-green-500 animate-bounce delay-[0ms]" />
-          <Rabbit className="size-10 text-red-500 animate-bounce delay-[200ms]" />
-          <Rabbit className="size-10 text-yellow-500 animate-bounce delay-[400ms]" />
+          <div className="flex items-end gap-4">
+            <Rabbit className="size-10 text-green-500 bunny" />
+            <Rabbit className="size-10 text-red-500 bunny" />
+            <Rabbit className="size-10 text-yellow-500 bunny" />
+          </div>
         </div>
         <p className="text-sm text-muted-foreground">chờ xíu nha...</p>
       </div>
