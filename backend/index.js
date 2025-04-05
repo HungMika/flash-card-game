@@ -18,7 +18,7 @@ db.connect();
 // apply library
 app.use(
   cors({
-    origin: process.env.BASE_URL || 'http://localhost:3000', // port fe
+    origin: ['http://localhost:3000'],
     credentials: true, // allow call api
   }),
 );

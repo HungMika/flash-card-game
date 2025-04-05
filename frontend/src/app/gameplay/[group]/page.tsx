@@ -46,8 +46,13 @@ export default function GroupPage() {
 
   if (loading) {
     return (
-      <div className="h-full flex-1 flex items-center justify-center flex-col gap-2">
-        <Rabbit className="size-6 animate-bounce text-blue-500" />
+      <div className="h-full flex-1 flex items-center justify-center flex-col gap-4">
+        <div className="flex items-end gap-4">
+          <Rabbit className="size-10 text-green-500 animate-bounce delay-[0ms]" />
+          <Rabbit className="size-10 text-red-500 animate-bounce delay-[200ms]" />
+          <Rabbit className="size-10 text-yellow-500 animate-bounce delay-[400ms]" />
+        </div>
+        <p className="text-sm text-muted-foreground">chờ xíu nha...</p>
       </div>
     );
   }
