@@ -1,11 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+
+// UI Components
 import { Card } from '@/components/ui/card';
-import { Trash2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { deleteSubject, updateSubject } from '@/services/subject';
-import Link from 'next/link';
+import { Input } from '@/components/ui/input';
+import { Trash2, Pencil, Loader2 } from 'lucide-react';
 import {
   Dialog,
   DialogTrigger,
@@ -14,9 +17,10 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+
+// Services + Hooks
+import { deleteSubject, updateSubject } from '@/services/subject';
 import { useConfirm } from './use-confirm';
-import toast from 'react-hot-toast';
 
 const ageGroups = ['1-2', '3-5', '6-8', '9-12'];
 
@@ -33,15 +37,18 @@ export const SubjectCard = ({
   ageGroup,
   onChange,
 }: SubjectCardProps) => {
+  const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [newName, setNewName] = useState(name);
   const [newAgeGroup, setNewAgeGroup] = useState(ageGroup);
+  const [loading, setLoading] = useState(false);
 
   const [ConfirmDialog, confirm] = useConfirm(
     'Are you sure?',
-    'This action cannot be undone',
+    'This action cannot be undone'
   );
 
+  // DELETE SUBJECT
   const handleDelete = async () => {
     const confirmed = await confirm();
     if (!confirmed) return;
@@ -51,36 +58,70 @@ export const SubjectCard = ({
       onChange();
     } catch (error) {
       toast.error('Error deleting subject');
-      //console.error('Error deleting subject:', error);
     }
   };
 
+  // EDIT SUBJECT
   const handleEdit = async () => {
-    if (!newName.trim() || !newAgeGroup.trim()) return;
+    const trimmedName = newName.trim();
+    const trimmedAgeGroup = newAgeGroup.trim();
+
+    if (!trimmedName || !trimmedAgeGroup) {
+      toast.error('Please enter valid name and age group.');
+      return;
+    }
+
     try {
-      await updateSubject(id, newName.trim(), newAgeGroup.trim());
+      await updateSubject(id, trimmedName, trimmedAgeGroup);
       toast.success('Subject updated successfully');
       setEditOpen(false);
       onChange();
     } catch (error) {
       toast.error('Error updating subject');
-      //console.error('Error updating subject:', error);
     }
+  };
+
+  // NAVIGATE TO SUBJECT DETAIL
+  const handleNavigate = async () => {
+    if (loading) return;
+    setLoading(true);
+    router.replace(`/dashboard/age-group/${ageGroup}/subject/${id}`);
   };
 
   return (
     <>
       <ConfirmDialog />
-      <Card className="p-4 flex items-center justify-between hover:shadow-md">
-        <Link
-          href={`/dashboard/age-group/${ageGroup}/subject/${id}`}
-          className="font-medium text-base text-primary hover:underline"
-        >
-          {name}
-        </Link>
+      <Card
+        onClick={handleNavigate}
+        className="relative p-4 flex items-center justify-between hover:shadow-md cursor-pointer min-h-[80px]"
+      >
+        {/* Overlay Loading */}
+        {loading && (
+          <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-10">
+            <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+          </div>
+        )}
 
-        <div className="flex items-center gap-2">
-          <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        {/* Left: Subject name */}
+        <div className="flex flex-col gap-2 justify-center z-0">
+          <p className="font-semibold text-base text-primary">{name}</p>
+        </div>
+
+        {/* Right: Action buttons */}
+        <div
+          className="flex items-center gap-2 z-0"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Dialog
+            open={editOpen}
+            onOpenChange={(open) => {
+              setEditOpen(open);
+              if (!open) {
+                setNewName(name);
+                setNewAgeGroup(ageGroup);
+              }
+            }}
+          >
             <DialogTrigger asChild>
               <Button variant="ghost" size="icon">
                 <Pencil className="w-4 h-4 text-blue-500" />
@@ -90,29 +131,38 @@ export const SubjectCard = ({
               <DialogHeader>
                 <DialogTitle>Edit Subject</DialogTitle>
               </DialogHeader>
-              <Input
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder="Tên mới"
-              />
-              <div className="mt-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Age Group
-                </label>
-                <select
-                  value={newAgeGroup}
-                  onChange={(e) => setNewAgeGroup(e.target.value)}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                >
-                  {ageGroups.map((group) => (
-                    <option key={group} value={group}>
-                      {group}
-                    </option>
-                  ))}
-                </select>
+
+              <div className="space-y-2">
+                <Input
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="New Subject Name"
+                />
+                <div className="mt-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Age Group
+                  </label>
+                  <select
+                    value={newAgeGroup}
+                    onChange={(e) => setNewAgeGroup(e.target.value)}
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                  >
+                    {ageGroups.map((group) => (
+                      <option key={group} value={group}>
+                        {group}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
+
               <DialogFooter className="mt-4">
-                <Button onClick={handleEdit}>Save</Button>
+                <Button
+                  onClick={handleEdit}
+                  className="bg-[#3f99e9] hover:bg-blue-500 font-semibold cursor-pointer text-white"
+                >
+                  Save
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>

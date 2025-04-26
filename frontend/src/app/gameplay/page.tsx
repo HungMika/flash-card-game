@@ -23,7 +23,12 @@ export default function GameplayPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <h1 className="text-2xl font-bold mb-6">Chọn Nhóm Lớp</h1>
+      <img
+          src="/FLASH-logo-colorful.png"
+          alt="Flash Logo"
+          className="h-16 w-auto mb-2"
+        />
+      <h2 className="text-xl font-bold mb-5">Chọn Nhóm Lớp</h2>
       <div className="grid grid-cols-2 gap-4 w-full max-w-md">
         {groups.map((group) => (
           <button

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { DashboardHeader } from '@/features/dashboard/components/header';
 
 export default function DashboardLayout({
   children,
@@ -17,5 +18,5 @@ export default function DashboardLayout({
     }
   }, [router]);
 
-  return <div>{children}</div>;
+  return <div><DashboardHeader/>{children}</div>;
 }

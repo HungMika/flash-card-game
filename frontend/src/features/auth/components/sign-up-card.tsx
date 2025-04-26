@@ -85,11 +85,15 @@ export const SignUpCard = ({ setstate }: SignUpCardProps) => {
 
   return (
     <Card className="w-full h-full p-8 max-w-md mx-auto mt-20">
-      <CardHeader className="px-0 pt-0">
-        <CardTitle>Create your new account</CardTitle>
-        <CardDescription>
-          Sign up to manage your flash game modules
-        </CardDescription>
+      <CardHeader className="pt-0 px-0 flex flex-col items-center text-center gap-4">
+        <img
+          src="/FLASH-logo-colorful.png"
+          alt="Flash Logo"
+          className="h-16 w-auto"
+        />
+        <CardTitle className="text-xl font-semibold text-[#1b1b62]">
+          Create an account
+        </CardTitle>
       </CardHeader>
 
       {error && (

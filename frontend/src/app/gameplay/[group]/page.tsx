@@ -67,7 +67,7 @@ export default function GroupPage() {
           className="text-green-500 text-3xl cursor-pointer hover:text-green-600 transition"
           onClick={() => router.push('/gameplay')}
         />
-        <div className="text-1xl font-bold mx-auto">Nhóm Lớp: {group}</div>
+        <div className="text-1xl font-bold mx-auto border-b border-gray-300">Nhóm Lớp: {group}</div>
       </div>
 
       {subjects.length === 0 ? (

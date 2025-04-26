@@ -1,14 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { getSubjectByUserId } from '@/services/subject';
 import { AgeGroupSelector } from '@/components/AgeGroupSelector';
-import { DashboardHeader } from '@/features/dashboard/components/header';
 import { SubjectCard } from '@/components/SubjectCard';
 import { AddSubjectModal } from '@/features/dashboard/components/add-subject-modal';
-import { getCurrUser } from '@/services/user';
-import { useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
+import { useAuthStore } from '@/services/auth-store';
 
 type Subject = {
   _id: string;
@@ -17,20 +14,12 @@ type Subject = {
   group: string;
 };
 
-type User = {
-  _id: string;
-  username: string;
-  email: string;
-};
-
 export default function DashboardPage() {
   const [selectedAge, setSelectedAge] = useState<string>('');
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const hasFetchedRef = useRef(false);
 
-  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
 
   const fetchSubjects = async (ageGroup: string) => {
     setIsLoading(true);
@@ -38,58 +27,33 @@ export default function DashboardPage() {
       const subjectsData = await getSubjectByUserId(ageGroup);
       setSubjects(subjectsData);
     } catch (error) {
-      //toast.error('Error fetching subjects.');
+      // toast.error('Error fetching subjects.');
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (hasFetchedRef.current) return;
-    hasFetchedRef.current = true;
-
-    async function fetchUser() {
-      try {
-        const userData = await getCurrUser();
-        if (userData) {
-          setUser(userData);
-        } else {
-          toast.error('User data not found.');
-          router.replace('/auth');
-        }
-      } catch (error) {
-        toast.error('Error fetching user data.');
-      }
-    }
-
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
     if (!selectedAge) return;
 
-    // Reset subjects before fetching new ones
     setSubjects([]);
-
     fetchSubjects(selectedAge);
   }, [selectedAge]);
 
   const handleSubjectAdded = () => {
-    fetchSubjects(selectedAge); // Lấy lại danh sách subjects sau khi thêm subject mới
+    fetchSubjects(selectedAge);
   };
 
   const handleSubjectDeleted = async (subjectId: string) => {
-    // Cập nhật trực tiếp trong state sau khi xoá
-    setSubjects((prevSubjects) =>
-      prevSubjects.filter((subject) => subject._id !== subjectId),
-    );
+    setSubjects((prev) => prev.filter((subject) => subject._id !== subjectId));
   };
 
-  if (!user) return null;
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
-      <DashboardHeader user={user} />
 
       <div className="p-6 flex-1">
         <h2 className="text-xl font-semibold mb-4">Select group</h2>
