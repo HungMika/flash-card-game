@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { BiSolidLeftArrowCircle } from 'react-icons/bi';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 export const QuestionHeader = () => {
   const params = useParams();
@@ -10,17 +10,22 @@ export const QuestionHeader = () => {
   const ageGroup = params.ageGroup as string;
 
   return (
-    <div className="flex items-center justify-between p-4 border-b bg-white shadow-sm">
-      <button
-        onClick={() => router.back()}
-        className="text-blue-600 hover:text-blue-800 transition-transform transform hover:scale-110"
+    <div className="flex items-center justify-between p-4 border-b border-gray-300 bg-white ">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => router.push('/dashboard')}
+        className="border border-gray-300 p-2"
       >
-        <BiSolidLeftArrowCircle className="text-3xl hover:text-3.5xl" />
-      </button>
+        <ArrowLeft className="w-5 h-5" />
+      </Button>
 
       <div className="flex-1 text-center text-lg font-semibold text-gray-700">
         Check group: {ageGroup}
       </div>
+
+      {/* Dummy div để căn giữa tiêu đề vì không có nút nào bên phải */}
+      <div className="w-10" />
     </div>
   );
 };
