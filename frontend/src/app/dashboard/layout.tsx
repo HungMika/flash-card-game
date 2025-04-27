@@ -3,20 +3,29 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { DashboardHeader } from '@/features/dashboard/components/header';
+import { useAuthStore } from '@/services/auth-store';
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('user');
-    if (!isLoggedIn) {
-      router.push('/auth');
+    if (!user) {
+      const localUser = localStorage.getItem('auth-user'); // Vì bạn dùng Zustand persist
+      if (!localUser || !JSON.parse(localUser).state.user) {
+        router.push('/auth'); // Không có user => redirect auth
+      }
     }
-  }, [router]);
+  }, [user, router]);
 
-  return <div><DashboardHeader/>{children}</div>;
+  if (!user) {
+    return null; // Hoặc loading spinner
+  }
+
+  return (
+    <div>
+      <DashboardHeader />
+      {children}
+    </div>
+  );
 }
