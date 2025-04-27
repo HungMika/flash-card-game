@@ -2,23 +2,20 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const protectedRoutes = ['/dashboard']; // bạn có thể thêm route khác nếu muốn
+const protectedRoutes = ['/dashboard'];
 
 export function middleware(request: NextRequest) {
-  const accessToken = request.cookies.get('accessToken')?.value;
   const currentPath = request.nextUrl.pathname;
 
   const isProtected = protectedRoutes.some((route) =>
     currentPath.startsWith(route)
   );
 
-  // 🔒 Nếu chưa có token và vào trang cần bảo vệ → chuyển về /auth
-  if (!accessToken && isProtected) {
+  if (!isProtected) {
     return NextResponse.redirect(new URL('/auth', request.url));
   }
 
-  // 🔁 Nếu đã có token mà vào /auth → chuyển về dashboard
-  if (accessToken && currentPath === '/auth') {
+  if (currentPath === '/auth') {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
@@ -26,5 +23,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/auth'], // middleware chỉ áp cho đúng các route cần
+  matcher: ['/dashboard/:path*', '/auth'],
 };
