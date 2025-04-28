@@ -2,45 +2,30 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/services/auth-store';
 
-export const RequireAuthentication = ({
-  children,
+export const useAuthRedirect = ({
+  redirectIfFound = false,
+  redirectTo = '/dashboard',
 }: {
-  children: React.ReactNode;
+  redirectIfFound?: boolean;
+  redirectTo?: string;
 }) => {
   const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
 
   useEffect(() => {
-    const checkAuth = () => {
-      const storedAuth = localStorage.getItem('auth-user');
-      if (!storedAuth) {
-        router.push('/auth');
-        return;
-      }
+    if (!hasHydrated) return;
 
-      try {
-        const parsed = JSON.parse(storedAuth);
-        if (!parsed?.state?.user) {
-          router.push('/auth');
-        }
-      } catch (error) {
-        console.error('Failed to parse auth-user from localStorage', error);
-        router.push('/auth');
-      }
-    };
+    if (redirectIfFound && user) {
+      router.push(redirectTo);
+    }
 
-    checkAuth();
+    if (!redirectIfFound && !user) {
+      router.push('/auth');
+    }
+  }, [user, hasHydrated, router, redirectIfFound, redirectTo]);
 
-    const handleStorageChange = () => {
-      checkAuth();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [router]);
-
-  return <>{children}</>;
+  return { user, hasHydrated };
 };
