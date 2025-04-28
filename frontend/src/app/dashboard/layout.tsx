@@ -1,25 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useAuthRedirect } from '@/hooks/auth-require';
 import { DashboardHeader } from '@/features/dashboard/components/header';
-import { useAuthStore } from '@/services/auth-store';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const user = useAuthStore((state) => state.user);
+  const { user, hasHydrated } = useAuthRedirect({ redirectIfFound: false }); 
+  // Ở dashboard, nếu *không có user* thì redirect ra /auth
 
-  useEffect(() => {
-    if (!user) {
-      const localUser = localStorage.getItem('auth-user'); // Vì bạn dùng Zustand persist
-      if (!localUser || !JSON.parse(localUser).state.user) {
-        router.push('/auth'); // Không có user => redirect auth
-      }
-    }
-  }, [user, router]);
-
-  if (!user) {
-    return null; // Hoặc loading spinner
+  if (!hasHydrated || !user) {
+    return null;
   }
 
   return (
